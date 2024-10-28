@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+
+    html,
+    body {
+        @apply bg-neutral-950 text-neutral-200
+    }
+
+    nav a.active {
+        @apply text-green-500
+    }
+}
+
+@layer components {
+
+    #nav {
+        @apply fixed top-5 left-5 z-10 text-red-500 flex gap-5
+    }
+
+}
