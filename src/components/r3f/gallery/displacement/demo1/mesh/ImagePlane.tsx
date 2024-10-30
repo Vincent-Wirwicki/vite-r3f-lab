@@ -6,47 +6,51 @@ import { frag } from "../shader/frag";
 import { vert } from "../shader/vert";
 
 const ImagePlane = ({
-  tex,
+  images,
   active,
   next,
   update,
   isAnim,
 }: {
-  tex: string[];
+  images: string[];
   active: number;
   next: number;
   update: () => void;
   isAnim: boolean;
 }) => {
   const matRef = useRef<ShaderMaterial>(null!);
-  const ratio = useAspect(window.innerWidth, window.innerHeight, 1);
-  const textures = useTexture(tex);
-  const dispTexture = useTexture("/images/dispTexture/Perlin.png");
+  const textures = useTexture(images);
+  const dispTexture = useTexture("/images/dispTexture/Turbulence.png");
+  const ratioImg = useAspect(
+    textures[0].source.data.naturalWidth,
+    textures[0].source.data.naturalHeight,
+    1
+  );
   const uniforms = useRef({
     uCurrTex: { value: null },
     uNextTex: { value: null },
-    uDispTex: { value: null },
+    uDispTex: { value: dispTexture },
     uDispFac: { value: 0.0 },
   });
 
   useEffect(() => {
-    matRef.current.uniforms.uDispTex.value = dispTexture;
     matRef.current.uniforms.uCurrTex.value = textures[active];
     matRef.current.uniforms.uNextTex.value = textures[next];
-  }, [active, next, dispTexture, textures]);
+  }, [active, next, textures]);
 
   useFrame(() => {
     if (isAnim) {
       matRef.current.uniforms.uDispFac.value += 0.02;
       if (matRef.current.uniforms.uDispFac.value >= 1) {
+        uniforms.current.uDispFac.value = 1;
         update();
         matRef.current.uniforms.uDispFac.value = 0;
-        matRef.current.uniforms.uCurrTex = matRef.current.uniforms.uNextTex;
+        matRef.current.uniforms.uCurrTex.value = textures[next];
       }
     }
   });
   return (
-    <mesh scale={new Vector3(ratio[0], ratio[1], 0)}>
+    <mesh scale={new Vector3(ratioImg[0], ratioImg[1], 0)}>
       <planeGeometry args={[1, 1, 10, 10]} />
       <shaderMaterial
         ref={matRef}
