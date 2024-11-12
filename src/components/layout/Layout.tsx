@@ -18,6 +18,8 @@ const Nav = () => {
     { path: "/", title: "home" },
     { path: "/about", title: "about" },
     { path: "/disp-gallery-1", title: "gal" },
+    { path: "/basic-1", title: "gal" },
+    { path: "/abstract-1", title: "abs" },
   ];
   return (
     <nav className="fixed top-5 left-5 z-10 text-neutral-500 flex gap-5">

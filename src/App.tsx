@@ -17,6 +17,14 @@ const App = () => {
           path: "disp-gallery-1",
           lazy: () => import("./pages/DispGallery"),
         },
+        {
+          path: "basic-1",
+          lazy: () => import("./pages/gallery/basic/Demo1Page"),
+        },
+        {
+          path: "abstract-1",
+          lazy: () => import("./pages/abstract/AbstractPage"),
+        },
       ],
     },
   ]);

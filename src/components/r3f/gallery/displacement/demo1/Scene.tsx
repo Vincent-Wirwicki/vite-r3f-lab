@@ -15,24 +15,21 @@ const Scene = () => {
   const [isAnim, setIsAnim] = useState(false);
 
   const handleNext = () => {
-    if (!isAnim) {
-      setIsAnim(true);
-      setNext((next + 1) % images.length);
-    }
+    if (isAnim) return;
+    setIsAnim(true);
+    setNext((next + 1) % images.length);
   };
 
   const handlePrev = () => {
-    if (!isAnim) {
-      setIsAnim(true);
-      setNext((next - 1 + images.length) % images.length);
-    }
+    if (isAnim) return;
+    setIsAnim(true);
+    setNext((next - 1 + images.length) % images.length);
   };
 
   const selectArtist = (i: number) => {
-    if (!isAnim) {
-      setIsAnim(true);
-      setNext(i);
-    }
+    if (isAnim) return;
+    setIsAnim(true);
+    setNext(i);
   };
 
   const updateStates = () => {
@@ -42,11 +39,10 @@ const Scene = () => {
 
   return (
     <section className="w-screen h-screen flex flex-col justify-center items-center ">
-      <div className="flex flex-col justify-center items-center w-3/5 py-2">
+      <div className="flex flex-col justify-center items-center w-3/5 py-4">
         <h2 className="text-2xl font-bold py-2">Selected artist </h2>
         <ArtistList current={next} selectArtist={selectArtist} />
       </div>
-
       <div className="w-3/5 h-3/5">
         <Canvas camera={{ position: [0, 0, 1] }}>
           <ImagePlane
@@ -69,8 +65,6 @@ const Scene = () => {
     </section>
   );
 };
-
-
 
 const ArtistList = ({
   current,
