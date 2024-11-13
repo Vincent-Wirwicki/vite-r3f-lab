@@ -1,4 +1,4 @@
-import Scene from "../../components/r3f/abstract/Scene";
+import Scene from "../../components/r3f/abstract/fiboSphere/Scene";
 
 export const Component = () => {
   return <Scene />;

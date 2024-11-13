@@ -23,7 +23,11 @@ const App = () => {
         },
         {
           path: "abstract-1",
-          lazy: () => import("./pages/abstract/AbstractPage"),
+          lazy: () => import("./pages/abstract/Page"),
+        },
+        {
+          path: "bg-1",
+          lazy: () => import("./pages/background/Page"),
         },
       ],
     },
