@@ -3,23 +3,32 @@ import Layout from "./components/layout/Layout";
 import Home from "./pages/Home";
 
 const App = () => {
+  // nav links
+  const paths = [
+    { path: "/", title: "home" },
+    { path: "/disp-gallery-1", title: "gal" },
+    { path: "/basic-1", title: "gal-2" },
+    { path: "/abstract-1", title: "abs" },
+    { path: "/bg-1", title: "bg" },
+    { path: "/lab", title: "lab" },
+    { path: "/fibo-loop-1", title: "fibo sphere 1" },
+    { path: "/fibo-loop-2", title: "fibo sphere 2" },
+  ];
+
+  // routing
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Layout />,
+      element: <Layout paths={paths} />,
       children: [
         { index: true, element: <Home /> },
         {
-          path: "about",
-          lazy: () => import("./pages/About"),
-        },
-        {
           path: "disp-gallery-1",
-          lazy: () => import("./pages/DispGallery"),
+          lazy: () => import("./pages/gallery/displacement/Page"),
         },
         {
           path: "basic-1",
-          lazy: () => import("./pages/gallery/basic/Demo1Page"),
+          lazy: () => import("./pages/gallery/basic/Page"),
         },
         {
           path: "abstract-1",
@@ -28,6 +37,18 @@ const App = () => {
         {
           path: "bg-1",
           lazy: () => import("./pages/background/Page"),
+        },
+        {
+          path: "lab",
+          lazy: () => import("./pages/abstract/lab/Page"),
+        },
+        {
+          path: "fibo-loop-1",
+          lazy: () => import("./pages/loop/fibo-sphere/demo1/Page"),
+        },
+        {
+          path: "fibo-loop-2",
+          lazy: () => import("./pages/loop/fibo-sphere/demo2/Page"),
         },
       ],
     },

@@ -44,44 +44,45 @@ export const vert = /*glsl*/ `
       return f/0.9375;
     }
 
-    float bounceOut(in float t) {
-        const float a = 4.0 / 11.0;
-        const float b = 8.0 / 11.0;
-        const float c = 9.0 / 10.0;
+    float map(in float v, in float iMin, in float iMax, in float oMin, in float oMax) { return oMin + (oMax - oMin) * (v - iMin) / (iMax - iMin); }
 
-        const float ca = 4356.0 / 361.0;
-        const float cb = 35442.0 / 1805.0;
-        const float cc = 16061.0 / 1805.0;
-
-        float t2 = t * t;
-
-        return t < a
-            ? 7.5625 * t2
-            : t < b
-                ? 9.075 * t2 - 9.9 * t + 3.4
-                : t < c
-                    ? ca * t2 - cb * t + cc
-                    : 10.8 * t * t - 20.52 * t + 10.72;
+    vec3 simpleRotateY(vec3 position, float angle) {
+        float cosA = cos(angle);
+        float sinA = sin(angle);
+        
+        float newX = position.x * cosA - position.z * sinA;
+        float newZ = position.x * sinA + position.z * cosA;
+        
+        return vec3(newX, position.y, newZ);
     }
 
-    float bounceInOut(in float t) {
-        return t < 0.5
-            ? 0.5 * (1.0 - bounceOut(1.0 - t * 2.0))
-            : 0.5 * bounceOut(t * 2.0 - 1.0) + 0.5;
-    }
-    
     void main(){
-      float size = 10.;
-      vec3 newPos = position;
-      float time = sin(uTime*1.15);
-      float ease = bounceInOut(time);
-      float theta = 2. * PI * position.x;
-      float phi = acos(mix(1.,10., ease * 1.25)*abs(time)*position.y  ) - PI *0.5;
-      float n = fbm(vec2(theta, phi) * ease  ) *0.15;
-      newPos.z += n;
-      if(newPos.z > 0.5) size = 15.;
-      vec3 loop = mix(position, newPos, ease);
-      vec4 mvPos = modelViewMatrix * vec4(loop, 1.);
+      float size = 15.;
+      vec3 p0 = position;
+      float time = mod(mod(uTime *0.45, 1.0) + 1.0, 1.0);
+      float m1 = map(sin(time  * PI ),0.,1.,0.,1.);
+      float rotAngle = map(sin(time  * 2. * PI ),0.,4.,-1.5,1.75);
+      float n = fbm(position.xy *2. ) * m1 * m1;
+      float mn = map(n * PI * 2., -1.,1.,1.,2.*PI);
+      float ms = map(sin(n * PI * 2.), -1.,1.,0.5,2.5);
+
+    
+      float phi;
+      float th;
+
+      
+
+      for(float i =0.; i<10.; i++){
+        phi = acos( mix((i + 0.5) * 0.5, 20., mn) * position.y  )     ;
+        th = (2. * PI * position.x)  * (i + 0.5 ) *0.5   ;
+        // th = ( 1. - .5* i * PI * position.x * (mn - i *.5 + 0.5 )   )  ;
+        size = (4. * (i+.5)) * (ms  ) ;
+
+      }
+      vec3 p1 = vec3(cos(th) * sin(phi),sin(th) * sin(phi), cos(phi) )   ;
+      vec3 loop = mix(p0, p1, m1 *m1 *m1);
+      loop = simpleRotateY(loop, rotAngle);
+      vec4 mvPos = modelViewMatrix * vec4(loop , 1.);
       gl_PointSize = size * (1. / -mvPos.z);
       gl_Position = projectionMatrix * mvPos;
     }`;

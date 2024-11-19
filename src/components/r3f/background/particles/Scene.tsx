@@ -1,17 +1,15 @@
-import { OrbitControls, Points, Stats } from "@react-three/drei";
+import { OrbitControls, Points } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import { AdditiveBlending, ShaderMaterial } from "three/webgpu";
 import { vert } from "./shader/vert";
 import { frag } from "./shader/frag";
-// 0.4,2.3,5.2 -0.75, 2.8, 4.6fov: 50
+
 const Scene = () => {
   return (
     <Canvas camera={{ position: [0, -2.75, 4] }}>
       <Particles />
-
       <OrbitControls />
-      <Stats />
     </Canvas>
   );
 };
@@ -21,7 +19,7 @@ export default Scene;
 const Particles = () => {
   const matRef = useRef<ShaderMaterial>(null!);
   const COUNT = 1000;
-
+  
   const pos = useMemo(() => {
     const pos = new Float32Array(COUNT * COUNT * 3);
     for (let r = 0; r < COUNT; r++) {

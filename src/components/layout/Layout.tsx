@@ -1,9 +1,16 @@
 import { NavLink, Outlet } from "react-router-dom";
 
-const Layout = () => {
+const Layout = ({
+  paths,
+}: {
+  paths: {
+    path: string;
+    title: string;
+  }[];
+}) => {
   return (
     <>
-      <Nav />
+      <Nav paths={paths}/>
       <main className="absolute top-0 left-0 w-screen h-screen ">
         <Outlet />
       </main>
@@ -13,15 +20,15 @@ const Layout = () => {
 
 export default Layout;
 
-const Nav = () => {
-  const paths = [
-    { path: "/", title: "home" },
-    { path: "/about", title: "about" },
-    { path: "/disp-gallery-1", title: "gal" },
-    { path: "/basic-1", title: "gal-2" },
-    { path: "/abstract-1", title: "abs" },
-    { path: "/bg-1", title: "bg" },
-  ];
+const Nav = ({
+  paths,
+}: {
+  paths: {
+    path: string;
+    title: string;
+  }[];
+}) => {
+
   return (
     <nav className="fixed top-5 left-5 z-10 text-neutral-500 flex gap-5">
       {paths.map(({ path, title }, i) => (
