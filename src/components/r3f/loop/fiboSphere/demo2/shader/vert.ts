@@ -33,56 +33,62 @@ export const vert = /*glsl*/ `
       return 130.0 * dot(m, g);
     }
 
-    const mat2 m2 = mat2(0.8,-0.6,0.6,0.8);
-    float fbm( in vec2 p ){
-      float f = 0.0;
-      f += 0.5000*snoise( p ); p = m2*p*2.02;
-      f += 0.2500*snoise( p ); p = m2*p*2.03;
-      f += 0.1250*snoise( p ); p = m2*p*2.01;
-      f += 0.0625*snoise( p );
+    vec2 snoise2( vec2 x ){
+      float s  = snoise(vec2( x ));
+      float s1 = snoise(vec2( x.y - 19.1, x.x + 47.2 ));
+      return vec2( s , s1 );
+    } 
 
-      return f/0.9375;
+    vec2 curl( vec2 p ) {
+      const float e = .1;
+      vec2 dx = vec2( e   , 0.0 );
+      vec2 dy = vec2( 0.0 , e   );
+
+      vec2 p_x0 = snoise2( p - dx );
+      vec2 p_x1 = snoise2( p + dx );
+      vec2 p_y0 = snoise2( p - dy );
+      vec2 p_y1 = snoise2( p + dy );
+
+      float x = p_x1.y + p_x0.y;
+      float y = p_y1.x - p_y0.x;
+
+      const float divisor = 1.0 / ( 2.0 * e );
+      #ifndef CURL_UNNORMALIZED
+      return normalize( vec2(x, y) * divisor );
+      #else
+      return vec2(x, y) * divisor;
+      #endif
     }
-
     float map(in float v, in float iMin, in float iMax, in float oMin, in float oMax) { return oMin + (oMax - oMin) * (v - iMin) / (iMax - iMin); }
-
-    vec3 simpleRotateY(vec3 position, float angle) {
-        float cosA = cos(angle);
-        float sinA = sin(angle);
-        
-        float newX = position.x * cosA - position.z * sinA;
-        float newZ = position.x * sinA + position.z * cosA;
-        
-        return vec3(newX, position.y, newZ);
-    }
 
     void main(){
       float size = 15.;
       vec3 p0 = position;
       float time = mod(mod(uTime *0.45, 1.0) + 1.0, 1.0);
       float m1 = map(sin(time  * PI ),0.,1.,0.,1.);
-      float rotAngle = map(sin(time  * 2. * PI ),0.,4.,-1.5,1.75);
-      float n = fbm(position.xy *2. ) * m1 * m1;
-      float mn = map(n * PI * 2., -1.,1.,1.,2.*PI);
-      float ms = map(sin(n * PI * 2.), -1.,1.,0.5,2.5);
+      float phi = acos(1. - 2. * position.y);
+      float theta = 8. * PI * position.x;
 
-    
-      float phi;
-      float th;
+      vec2 polar = vec2(cos(theta) * sin(phi), sin(phi) * sin(theta));
+      vec2 polar2 = vec2(phi, theta);
+      float angle = atan(cos(polar.x), sin(polar.y));
 
       
+      
+      
+      vec2 noise = curl( p0.xy * 4. * m1   );
+      float mc = map(noise.x  ,-1.,1.,.075,.15);
 
-      for(float i =0.; i<10.; i++){
-        phi = acos( mix((i + 0.5) * 0.5, 20., mn) * position.y  )     ;
-        th = (2. * PI * position.x)  * (i + 0.5 ) *0.5   ;
-        // th = ( 1. - .5* i * PI * position.x * (mn - i *.5 + 0.5 )   )  ;
-        size = (4. * (i+.5)) * (ms  ) ;
+      p0.z -= mc;
+      size += abs( 1. - p0.z *5. + 5.*mc   ) ;
 
-      }
-      vec3 p1 = vec3(cos(th) * sin(phi),sin(th) * sin(phi), cos(phi) )   ;
-      vec3 loop = mix(p0, p1, m1 *m1 *m1);
-      loop = simpleRotateY(loop, rotAngle);
-      vec4 mvPos = modelViewMatrix * vec4(loop , 1.);
+
+      // p0.x = cos(theta) * sin(phi);
+      // p0.y = sin(phi) * sin(theta);
+      // p0.z = cos(phi);
+
+
+      vec4 mvPos = modelViewMatrix * vec4(p0 , 1.);
       gl_PointSize = size * (1. / -mvPos.z);
       gl_Position = projectionMatrix * mvPos;
     }`;

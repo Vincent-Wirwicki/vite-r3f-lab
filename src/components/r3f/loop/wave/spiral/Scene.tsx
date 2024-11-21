@@ -8,7 +8,7 @@ import { ShaderMaterial } from "three";
 
 const Scene = () => {
   return (
-    <Canvas>
+    <Canvas camera={{ position: [0, 0, 10] }}>
       <Particles />
       <OrbitControls />
     </Canvas>
@@ -39,22 +39,9 @@ const Particles = () => {
     return pos;
   }, []);
 
-  // const pos = useMemo(() => {
-  //   const phi = Math.PI * (Math.sqrt(5) - 1);
-  //   const pos = new Float32Array(COUNT * 3);
-  //   for (let i = 0; i < COUNT; i++) {
-  //     const y = 1 - (i / (COUNT - 1)) * 2;
-  //     const radius = Math.sqrt(1 - y * y);
-  //     const theta = phi * i;
-  //     const x = Math.cos(theta) * radius;
-  //     const z = 0;
-  //     pos.set([x, y, z], i * 3);
-  //   }
-  //   return pos;
-  // }, []);
-
-  useFrame(({ clock }) => {
+  useFrame(({ clock, camera }) => {
     matRef.current.uniforms.uTime.value = clock.getElapsedTime();
+    console.log(camera.position);
   });
 
   return (
