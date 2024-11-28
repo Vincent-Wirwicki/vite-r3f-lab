@@ -7,7 +7,7 @@ import { frag } from "./shader/frag";
 
 const Scene = () => {
   return (
-    <Canvas camera={{ position: [0, 0.7, 3.8] }}>
+    <Canvas camera={{ position: [0, -0.25, -5.15] }}>
       <Particles />
       {/* <LinesFibo /> */}
       <OrbitControls />
@@ -45,8 +45,9 @@ const Particles = () => {
     []
   );
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock, camera }) => {
     matRef.current.uniforms.uTime.value = clock.getElapsedTime();
+    console.log(camera.position);
   });
 
   return (
