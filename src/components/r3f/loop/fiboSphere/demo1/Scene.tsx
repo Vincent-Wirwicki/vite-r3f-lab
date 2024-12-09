@@ -7,7 +7,7 @@ import { frag } from "./shader/frag";
 
 const Scene = () => {
   return (
-    <Canvas camera={{ position: [0, 0.7, 3.8] }}>
+    <Canvas camera={{ position: [0, 0.7, 4.2] }}>
       <Particles />
       {/* <LinesFibo /> */}
       <OrbitControls />

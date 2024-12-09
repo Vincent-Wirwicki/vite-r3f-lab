@@ -53,18 +53,14 @@ export const vert = /*glsl*/ `
         float y = p_y1.x - p_y0.x;
 
         const float divisor = 1.0 / ( 2.0 * e );
-        #ifndef CURL_UNNORMALIZED
         return normalize( vec2(x, y) * divisor );
-        #else
-        return vec2(x, y) * divisor;
-        #endif
       }
+
       float map(in float v, in float iMin, in float iMax, in float oMin, in float oMax) { return oMin + (oMax - oMin) * (v - iMin) / (iMax - iMin); }
 
       void main(){
         float size = 10.;
         vec3 p0 = position;
-        vec3 p1 = position;
 
         float dist = length(position.xy) - 0.5;
         float a = atan(position.x, position.y) ;
@@ -72,26 +68,20 @@ export const vert = /*glsl*/ `
         float time = mod(mod(uTime *0.15, 1.0) + 1.0, 1.0);
         float m1 = map(sin(time  *2. *PI ),-1.,1.,-1.,1.);
 
-        float delta = map(m1, -1.,1., -2.,0.);
+        float delta = map(m1, -1.,1.,0.,-PI );
 
-        float phi = map( acos( delta * (1. - 2. * position.z)),-1.,1., 6., 0. );
-
-            
-        float beta = map(m1 ,-1.,1.,1.2,1.1);
-        float theta = map(2. * PI * pow(position.x, 4.) , 0.5, 1., 1.,0.1 * sin(phi)); 
-
-
-        vec2 noise = curl( position.xy + (1.5 * m1 -1.)  ) * 0.2 ;
-        noise += curl(position.xy * 2. ) *0.1;
-        noise += curl(position.xy * 4. ) *0.05;
-        float ny = map(noise.y  ,0.,1., 0., sin(phi ));
-        float nx = map(noise.x  ,0.,1., 0., cos(phi) );
+        float phi = map( acos( delta * (1. - 2. * position.z)),-1.,1., 4., 0. );          
+        // float beta = map(m1 ,-1.,1.,1.2,1.1);
+        // float theta = map(2. * PI * pow(position.x, 4.) , 0.5, 1., 1.,0.1 * sin(phi)); 
+        vec2 noise = curl( position.xy + (1.25 * m1 -1.)  )  *0.2   ;
+        noise += curl(position.xy * 2. ) *0.1 ;
+        noise += curl(position.xy * 4. ) *0.05 ;
+        float ny = map(noise.y,0.,1., 0., sin(phi));
+        float nx = map(noise.x,0.,1., 0., sin(phi));
               
-        p0.xy -= vec2(nx, ny) ;
+        p0.xy += vec2(nx, ny) ;
 
-        // p0.xy = (p0.xy - 0.5) * beta + 0.5;
-
-        size *= ((1. - phi  ) * dist ) *(2. * beta + 1.) ;
+        size *= ((1. - phi  ) * dist ) + 2. ;
 
         vec3 loop = mix(p0,position, m1*m1);
         

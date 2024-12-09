@@ -59,10 +59,12 @@ export const vert = /*glsl*/ `
     void main(){
       float size;
       vec3 p0 = position;
-      float time = mod(mod(uTime *0.45, 1.0) + 1.0, 1.0);
+      float time = mod(mod(uTime *0.35, 1.0) + 1.0, 1.0);
       float m1 = map(sin(time  * PI ),0.,1.,0.,1.);
-      float rotAngle = map(sin(time  * 2. * PI ),0.,4.,-1.5,1.75);
-      float n = fbm(position.xy *2. ) * m1 * m1;
+      // float rotAngle = map(sin(time  * 2. * PI ),0.,4.,-1.5,1.75);
+      float rotAngle = map(sin(time  * 2. * PI ),-1.,1.,-.5, 2.);
+
+      float n = fbm(position.xy *2.) * m1 * m1 ;
       float mn = map(sin(n * PI * 2.), -1.,1.,0.5,1.5);
       float ms = map(sin(n * PI * 2.), -1.,1.,0.5,2.5);
 
@@ -70,14 +72,14 @@ export const vert = /*glsl*/ `
       float phi ;
       float th;
 
-      for(float i =0.; i<10.; i++){
-        phi = acos(( i + 1.) * position.y  )    ;
-        th = ( 1. - .5* i * PI * position.x * mn    )  ;
+      for(float i =1.; i<10.; i++){
+        phi = acos(i  * position.y  )    ;
+        th = ( 1. - .5* i * PI * position.z    )  ;
         // th = ( 1. - .5* i * PI * position.x * (mn - i *.5 + 0.5 )   )  ;
-        size = (2. * (i+.5)) * (ms  ) ;
-
+        size = (2. * (i+.5)) * ms;
       }
-      vec3 p1 = vec3(cos(th) * sin(phi),sin(th) * sin(phi), cos(phi) )   ;
+
+      vec3 p1 = vec3(cos(th) * sin(phi),sin(th) * sin(phi), cos(phi) );
       vec3 loop = mix(p0, p1, m1 *m1 *m1);
       loop = simpleRotateY(loop, rotAngle);
       vec4 mvPos = modelViewMatrix * vec4(loop , 1.);
