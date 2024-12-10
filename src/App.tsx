@@ -8,8 +8,8 @@ const App = () => {
     { path: "/", title: "home" },
     { path: "/disp-gallery-1", title: "gal" },
     { path: "/basic-1", title: "gal-2" },
-    { path: "/abstract-1", title: "abs" },
     { path: "/bg-1", title: "bg" },
+    { path: "/bg-color", title: "bg-color" },
     { path: "/lab", title: "lab" },
     { path: "/fibo-loop-1", title: "fibo sphere 1" },
     { path: "/fibo-loop-2", title: "fibo sphere 2" },
@@ -38,6 +38,10 @@ const App = () => {
         {
           path: "bg-1",
           lazy: () => import("./pages/background/Page"),
+        },
+        {
+          path: "bg-color",
+          lazy: () => import("./pages/background/color/demo1/Page"),
         },
         {
           path: "lab",
