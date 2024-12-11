@@ -9,7 +9,9 @@ const App = () => {
     { path: "/disp-gallery-1", title: "gal" },
     { path: "/basic-1", title: "gal-2" },
     { path: "/bg-1", title: "bg" },
-    { path: "/bg-color", title: "bg-color" },
+    { path: "/bg-color", title: "bg-color-1" },
+    { path: "/bg-color-2", title: "bg-color-2" },
+    { path: "/bg-color-3", title: "bg-color-3" },
     { path: "/lab", title: "lab" },
     { path: "/fibo-loop-1", title: "fibo sphere 1" },
     { path: "/fibo-loop-2", title: "fibo sphere 2" },
@@ -42,6 +44,14 @@ const App = () => {
         {
           path: "bg-color",
           lazy: () => import("./pages/background/color/demo1/Page"),
+        },
+        {
+          path: "bg-color-2",
+          lazy: () => import("./pages/background/color/demo2/Page"),
+        },
+        {
+          path: "bg-color-3",
+          lazy: () => import("./pages/background/color/demo3/Page"),
         },
         {
           path: "lab",
