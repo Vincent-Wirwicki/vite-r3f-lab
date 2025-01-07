@@ -37,9 +37,9 @@ export const frag = /*glsl*/ `
     float pattern(in vec2 p, in float t, out vec2 q, out vec2 r, out vec2 g)
     {
     	  q = vec2(fbm(p), fbm(p + vec2(10, 1.3)));
-        r = vec2(fbm(p + 4.0 * q + vec2(t) + vec2(5., 10.)), fbm(p + 4.0 * q + vec2(t) + vec2(9., 2.8)));
-        g = vec2(fbm(p + 2.0 * r + vec2(t * 20.0) + vec2(2, 6)), fbm(p + 2.0 * r + vec2(t * 10.0) + vec2(5, 3)));
-        return fbm(p + 5.5 * g + vec2(t * 7.0));
+        r = vec2(fbm(p + 4.0 * q + vec2(t) + vec2(5.5)), fbm(p + 4.0 * q + vec2(t) + vec2(2.5)));
+        g = vec2(fbm(p + 2.0 * r + vec2(t * 20.0) + vec2(1.5)), fbm(p + 2.0 * r + vec2(t * 10.0) + vec2(8.5)));
+        return fbm(p + 8. * g + vec2(t * 8.0));
     }
       float map(in float v, in float iMin, in float iMax, in float oMin, in float oMax) { return oMin + (oMax - oMin) * (v - iMin) / (iMax - iMin); }
 
@@ -47,19 +47,40 @@ export const frag = /*glsl*/ `
       vec2 uv = vUv;
       vec3 p = vPos;
       vec4 tex = texture2D(uTexture, uv);
+      float angle = atan(uv.x, uv.y);
+      float dist = length(uv);
 
-      float loopTime = mod(uTime * 0.15, 2.0 * 3.14159);
-      float time = sin(loopTime) * sin(loopTime * 0.5);
+      float loopTime = mod(uTime * 0.01, 2.0 * 3.14159);
+      float time = map(loopTime * 2. + (uv.x * uv.y), -4.,4.,2.5,-.5) ;
+      float delta = map(time, -1.,1.,15.,20.);
+      float delta2 = map(time, 0.,1.,.55,.15);
 
       vec2 q, r, g;
-      float noise = pattern(vUv.xy * vec2(20.5, 2.), time, q, r, g);
-      vec3 col = mix(vec3(0.496,0.957,0.995), vec3(0., 0., 0.), smoothstep(0.8,1., noise) );
-      col = mix(col, vec3(.0,0,0), .8 * r.x * r.x + time);
-      col = mix(col, vec3(0,0,0.5), dot(q,q));
-      col = mix(col, vec3(1), .8*g.y);
-      col = mix(col, vec3(0), smoothstep(0., 0.5, noise) * smoothstep(0.5, 0.3, noise));
-      col = mix(col, vec3(0), smoothstep(0.3, 0.5, noise) * smoothstep(0.5, 0.3, noise));
+      float noise = pattern(vUv.xy * vec2(delta) , time, q, r, g);
+      vec3 col = vec3(0.);
+
+      col = mix(col, vec3(1., 0., 0.), noise    );
+      col = mix(col, vec3(0.75,0.15,0.), r.x * 2. );
+      col = mix(col, vec3(0.,0.,0.), g.x * .5 );
+      col = mix(col, vec3(0), smoothstep(0.2, .5, noise) * smoothstep(0.5, .2, noise));
+
 
       gl_FragColor = vec4(col,1.);
     }
 `;
+
+// col = mix(col, vec3(.0,0.15,0.55), .8 * r.x * r.x);
+//  col = mix(col, vec3(.0,0.75,0.55), .15 * r.y * r.y);
+// col = mix(col, vec3(0.05, 0.5, 0.155), (.5*g.x*g.x - 0.5) +0.5);
+// col = mix(col, vec3(0.75, 0., 0.155), delta2*g.y*g.y );
+
+// col = mix(col, vec3(0.15,0.,0.75), q.x*q.x  );
+// // col = mix(col, vec3(0.15,0.,0.55), 0.8*g.y * g.y );
+
+// col = mix(col, vec3(0.45,0.,0.), smoothstep(0., .25, noise * g.x * g.y));
+// // col *= noise *2.;
+// col *= clamp(noise * 2., 0., 1.);
+
+// col = mix(col, vec3(0), smoothstep(0.8, 1., noise) * smoothstep(0.8, 1., noise));
+
+// col = mix(col, vec3(0), smoothstep(0.3, 0.5, noise) * smoothstep(0.5, 0.8, noise));

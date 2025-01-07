@@ -7,7 +7,7 @@ import { frag } from "./shader/frag";
 
 const Scene = () => {
   return (
-    <Canvas camera={{ position: [0, -0.25, -5.15] }}>
+    <Canvas camera={{ position: [0, 5.15, 0] }}>
       <Particles />
       {/* <LinesFibo /> */}
       <OrbitControls />
@@ -18,7 +18,7 @@ const Scene = () => {
 export default Scene;
 
 const Particles = () => {
-  const COUNT = 1500;
+  const COUNT = 1400;
   const matRef = useRef<ShaderMaterial>(null!);
   // Evenly points distrubution on a sphere
   // https://stackoverflow.com/questions/9600801/evenly-distributing-n-points-on-a-sphere

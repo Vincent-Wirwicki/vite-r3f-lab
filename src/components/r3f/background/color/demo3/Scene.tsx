@@ -38,14 +38,12 @@ const PlaneBg = () => {
   return (
     <mesh scale={scale}>
       <planeGeometry args={[1, 1, 1, 1]} />
-      {/* <boxGeometry args={[1, 1, 1, 300]} /> */}
       <shaderMaterial
         ref={matRef}
         uniforms={shader.uniforms}
         fragmentShader={shader.fragment}
         vertexShader={shader.vertex}
         transparent={true}
-        // wireframe
       />
     </mesh>
   );
