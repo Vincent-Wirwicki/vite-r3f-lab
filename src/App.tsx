@@ -15,7 +15,7 @@ const App = () => {
     { path: "/lab", title: "lab" },
     { path: "/fibo-loop-1", title: "fibo sphere 1" },
     { path: "/fibo-loop-2", title: "fibo sphere 2" },
-    { path: "/fibo-loop-3", title: "fibo sphere 2" },
+    { path: "/fibo-loop-3", title: "fibo sphere 3" },
     { path: "/spiral-wave", title: "spiral wave" },
   ];
 
