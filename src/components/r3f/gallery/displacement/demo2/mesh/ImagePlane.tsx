@@ -34,12 +34,11 @@ const ImagePlane = ({
     uNextTex: { value: textures[next] },
     uDispTex: { value: dispTexture },
     uProgress: { value: 0.0 },
-    uDir: { value: direction },
+    uDir: { value: 1. },
     uTime: { value: 0 },
   });
 
   useEffect(() => {
-    // matRef.current.uniforms.uCurrTex.value = textures[active];
     matRef.current.uniforms.uNextTex.value = textures[next];
     matRef.current.uniforms.uDir.value = direction;
   }, [active, next, textures, direction]);

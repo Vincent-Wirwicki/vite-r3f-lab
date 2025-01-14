@@ -10,15 +10,20 @@ export const frag = /* glsl */ `
     varying vec2 vUv;
 
     void main(){
-        float pixelSize = 10.;
+        float pixelSize = 5.;
         vec2 pixel = floor(vUv * pixelSize) / pixelSize;
-        
-        // experiment math here to mix uv
-        vec2 distortion1 = vec2(vUv.x + uProgress * pixel.x * uDir, vUv.y   );
-        vec2 distortion2 = vec2(vUv.x - ( 1. - uProgress) * pixel.x * uDir , vUv.y );
+        vec4 dispTex = texture2D(uDispTex, vUv);
+        vec2 scaleUv = (vUv - 0.5) * 4.2 + 0.5;
 
-        vec4 current = texture2D(uCurrTex, distortion1);
-        vec4 next = texture2D(uNextTex, distortion2);
+        // experiment math here to mix uv
+        float dispX =  uDir * pixel.y * dispTex.y * 2.;
+        float dispY =  uDir * pixel.x * dispTex.x * 2.;
+
+        vec2 uv1 = vec2(vUv.x + dispX * uProgress, vUv.y);
+        vec2 uv2 = vec2(vUv.x - dispX * (1. - uProgress), vUv.y);
+
+        vec4 current = texture2D(uCurrTex, uv1);
+        vec4 next = texture2D(uNextTex, uv2);
         
         vec4 render = mix(current, next,uProgress  );
 

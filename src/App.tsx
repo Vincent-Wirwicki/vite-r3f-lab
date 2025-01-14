@@ -6,7 +6,8 @@ const App = () => {
   // nav links
   const paths = [
     { path: "/", title: "home" },
-    { path: "/disp-gallery-1", title: "gal" },
+    { path: "/disp-gallery-1", title: "disp-gal-1" },
+    { path: "/disp-gallery-2", title: "disp-gal-2" },
     { path: "/basic-1", title: "gal-2" },
     { path: "/bg-1", title: "bg" },
     { path: "/bg-color", title: "bg-color-1" },
@@ -28,7 +29,11 @@ const App = () => {
         { index: true, element: <Home /> },
         {
           path: "disp-gallery-1",
-          lazy: () => import("./pages/gallery/displacement/Page"),
+          lazy: () => import("./pages/gallery/displacement/demo1/Page"),
+        },
+        {
+          path: "disp-gallery-2",
+          lazy: () => import("./pages/gallery/displacement/demo2/Page"),
         },
         {
           path: "basic-1",

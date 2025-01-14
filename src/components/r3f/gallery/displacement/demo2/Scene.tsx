@@ -23,7 +23,7 @@ const Scene = () => {
 
   const transition = () => {
     animate(progress, 1, {
-      duration: 1,
+      duration: 0.75,
       // ease: "circInOut",
       onComplete: () => {
         setCurrent(next);
@@ -33,7 +33,7 @@ const Scene = () => {
       },
     });
   };
-  // || (i === 0 && next === images.length - 1)
+
   const selectArtist = (i: number) => {
     if (isAnim || next === i) return;
     setNext(i);
