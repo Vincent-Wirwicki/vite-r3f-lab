@@ -7,6 +7,7 @@ export const vert = /* glsl */ `
     varying vec2 vPat1;
     varying vec2 vPat2;
     varying vec2 vPat3;
+    varying vec3 vNormal;
 
     #define PI 3.141592653
 
@@ -65,8 +66,8 @@ export const vert = /* glsl */ `
         vec2 p1 = vec2(fbm(position.xy - 0.5), fbm(position.xy  + vec2(10.,8.5) ));
         vec2 p2 = vec2(fbm(p1 + uTime * 0.1 + vec2(10.5, 5.5)), fbm(p1 + vec2(0.75,10.5) + uTime *0.1));
         vec2 p3 = vec2(fbm(p2 + uTime * 0.1 + vec2(-5.5, 15.5)), fbm(p2 + vec2(5.75,10.5) + uTime *0.1));
-
-
+        
+        vNormal = normal;
         vPat1 = p1;
         vPat2 = p2;
         vPat3 = p3;

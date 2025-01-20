@@ -72,18 +72,26 @@ const BustModel = () => {
             uniforms={shader.uniforms}
             fragmentShader={shader.frag}
             vertexShader={shader.vert}
-            transparent
+
             // wireframe
           />
         </mesh>
         {/* <mesh
-          scale={10.8}
+          scale={10.2}
           castShadow
           geometry={nodes.marble_bust_01.geometry}
           // material={materials.marble_bust_01}
           position={[0, 0.2, 0.15]}
         >
-          <MeshTransmissionMaterial transmission={1} />
+          <shaderMaterial
+            ref={matRef}
+            attach="material"
+            uniforms={shader.uniforms}
+            fragmentShader={shader.frag}
+            vertexShader={shader.vert}
+            transparent
+            wireframe
+          />
         </mesh> */}
       </Center>
     </group>

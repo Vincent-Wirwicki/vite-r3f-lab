@@ -17,6 +17,7 @@ const App = () => {
     { path: "/fibo-loop-1", title: "fibo sphere 1" },
     { path: "/fibo-loop-2", title: "fibo sphere 2" },
     { path: "/fibo-loop-3", title: "fibo sphere 3" },
+    { path: "/3d-model-01", title: "3d mod 1" },
     { path: "/spiral-wave", title: "spiral wave" },
   ];
 
@@ -74,6 +75,10 @@ const App = () => {
         {
           path: "fibo-loop-3",
           lazy: () => import("./pages/loop/fibo-sphere/demo3/Page"),
+        },
+        {
+          path: "3d-model-01",
+          lazy: () => import("./pages/3d-model/demo01/Page"),
         },
         {
           path: "spiral-wave",

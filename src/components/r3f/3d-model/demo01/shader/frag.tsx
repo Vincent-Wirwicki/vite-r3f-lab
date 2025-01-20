@@ -7,6 +7,7 @@ export const frag = /* glsl */ `
     varying vec2 vPat1;
     varying vec2 vPat2;
     varying vec2 vPat3;
+    varying vec3 vNormal;
 
       //	Simplex 3D Noise 
       //	by Ian McEwan, Stefan Gustavson (https://github.com/stegu/webgl-noise)
@@ -96,11 +97,38 @@ vec3 tonemapFilmic(vec3 v) {
     return v;
 }
 
+vec3 tonemapACES(vec3 v) {
+    const float a = 2.51;
+    const float b = 0.03;
+    const float c = 2.43;
+    const float d = 0.59;
+    const float e = 0.14;
+    return clamp((v*(a*v+b))/(v*(c*v+d)+e),0.,1.);
+}
+
+
 vec3 hsv2rgb(vec3 c) {
   vec4 K = vec4(1.0f, 2.0f / 3.0f, 1.0f / 3.0f, 3.0f);
   vec3 p = abs(fract(c.xxx + K.xyz) * 6.0f - K.www);
   return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0f, 1.0f), c.y);
 }
+
+vec3 hue2rgb(const in float hue) {
+    float R = abs(hue * 6.0 - 3.0) - 1.0;
+    float G = 2.0 - abs(hue * 6.0 - 2.0);
+    float B = 2.0 - abs(hue * 6.0 - 4.0);
+    return clamp(vec3(R,G,B),0.,1.);
+}
+
+vec3 hsl2rgb(const in vec3 hsl) {
+    vec3 rgb = hue2rgb(hsl.x);
+    float C = (1.0 - abs(2.0 * hsl.z - 1.0)) * hsl.y;
+    return (rgb - 0.5) * C + hsl.z;
+}
+vec3 tonemapUnreal(const vec3 x) { return x / (x + 0.155) * 1.019; }
+vec3  blendDifference(in vec3 base, in vec3 blend) { return abs(base-blend); }
+float map(float v, float iMin, float iMax ) { return (v-iMin)/(iMax-iMin); }
+
     void main(){
 
       float dist = 1. - length(gl_PointCoord.xy - vec2(0.5));
@@ -108,13 +136,18 @@ vec3 hsv2rgb(vec3 c) {
       vec4 diffuse = texture2D(uDiffuse, vUv);
       vec2 newUv = vUv;
       vec3 newPos = vPos;
-      vec3 px = floor(newPos * 50.) /50.;
-      vec3 fractPos = fract(newPos);
-      vec3 noisePos = snoise3(newPos * 10. + uTime * 0.2) *0.5;
-      float n = snoise(fractPos  + uTime *0.1 ) ;
-      vec3 convert = hsv2rgb(vec3(0.75, n, 1.));
+      vec3 newNormal = vNormal;
+
+      vec3 noisePos = abs(snoise3(newNormal * 1.  )) ;
+      float n = snoise(newNormal *.85 + uTime *0.2 ) ;
+      float ms = map(abs(n), 0.,.45);
+      float mh = map(abs(n), 0.7,0.75);
+      vec3 convert = hsl2rgb(vec3(0.755, ms, .35));
       vec3 col = tonemapFilmic(convert);
-      gl_FragColor = vec4(convert,col.x);
+
+      // float diff = max(dot(nPos, nLight),0.);
+      // c *= diff;
+      gl_FragColor = vec4(col,1.);
     }
 
 `;
