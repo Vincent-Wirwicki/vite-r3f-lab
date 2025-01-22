@@ -84,52 +84,52 @@ export const frag = /* glsl */ `
                                       dot(p2,x2), dot(p3,x3) ) );
       }
 
-    vec3 snoise3( vec3 x ){
-      float s  = snoise(vec3( x ));
-      float s1 = snoise(vec3( x.y - 19.1 , x.z + 33.4 , x.x + 47.2 ));
-      float s2 = snoise(vec3( x.z + 74.2 , x.x - 124.5 , x.y + 99.4 ));
-      return vec3( s , s1 , s2 );
-    }
+      vec3 snoise3( vec3 x ){
+    float s  = snoise(vec3( x ));
+    float s1 = snoise(vec3( x.y - 19.1 , x.z + 33.4 , x.x + 47.2 ));
+    float s2 = snoise(vec3( x.z + 74.2 , x.x - 124.5 , x.y + 99.4 ));
+    return vec3( s , s1 , s2 );
+}
 
-    vec3 tonemapFilmic(vec3 v) {
-        v = max(vec3(0.0), v - 0.004);
-        v = (v * (6.2 * v + 0.5)) / (v * (6.2 * v + 1.7) + 0.06);
-        return v;
-    }
+vec3 tonemapFilmic(vec3 v) {
+    v = max(vec3(0.0), v - 0.004);
+    v = (v * (6.2 * v + 0.5)) / (v * (6.2 * v + 1.7) + 0.06);
+    return v;
+}
 
-    vec3 tonemapACES(vec3 v) {
-        const float a = 2.51;
-        const float b = 0.03;
-        const float c = 2.43;
-        const float d = 0.59;
-        const float e = 0.14;
-        return clamp((v*(a*v+b))/(v*(c*v+d)+e),0.,1.);
-    }
+vec3 tonemapACES(vec3 v) {
+    const float a = 2.51;
+    const float b = 0.03;
+    const float c = 2.43;
+    const float d = 0.59;
+    const float e = 0.14;
+    return clamp((v*(a*v+b))/(v*(c*v+d)+e),0.,1.);
+}
 
-    vec3 tonemapUnreal(const vec3 x) { return x / (x + 0.155) * 1.019; }
 
-    vec3 hue2rgb( in float hue) {
-        float R = abs(hue * 6.0 - 3.0) - 1.0;
-        float G = 2.0 - abs(hue * 6.0 - 2.0);
-        float B = 2.0 - abs(hue * 6.0 - 4.0);
-        return clamp(vec3(R,G,B),0.,1.);
-    }
+vec3 hsv2rgb(vec3 c) {
+  vec4 K = vec4(1.0f, 2.0f / 3.0f, 1.0f / 3.0f, 3.0f);
+  vec3 p = abs(fract(c.xxx + K.xyz) * 6.0f - K.www);
+  return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0f, 1.0f), c.y);
+}
 
-    vec3 hsv2rgb(vec3 c) {
-      vec4 K = vec4(1.0f, 2.0f / 3.0f, 1.0f / 3.0f, 3.0f);
-      vec3 p = abs(fract(c.xxx + K.xyz) * 6.0f - K.www);
-      return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0f, 1.0f), c.y);
-    }
+vec3 hue2rgb(const in float hue) {
+    float R = abs(hue * 6.0 - 3.0) - 1.0;
+    float G = 2.0 - abs(hue * 6.0 - 2.0);
+    float B = 2.0 - abs(hue * 6.0 - 4.0);
+    return clamp(vec3(R,G,B),0.,1.);
+}
 
-    vec3 hsl2rgb(const in vec3 hsl) {
-        vec3 rgb = hue2rgb(hsl.x);
-        float C = (1.0 - abs(2.0 * hsl.z - 1.0)) * hsl.y;
-        return (rgb - 0.5) * C + hsl.z;
-    }
-    vec3  blendDifference(in vec3 base, in vec3 blend) { return abs(base-blend); }
-    float map(float v, float iMin, float iMax ) { return (v-iMin)/(iMax-iMin); }
-    float map1(in float v, in float iMin, in float iMax, in float oMin, in float oMax) { return oMin + (oMax - oMin) * (v - iMin) / (iMax - iMin); }
-    
+vec3 hsl2rgb(const in vec3 hsl) {
+    vec3 rgb = hue2rgb(hsl.x);
+    float C = (1.0 - abs(2.0 * hsl.z - 1.0)) * hsl.y;
+    return (rgb - 0.5) * C + hsl.z;
+}
+vec3 tonemapUnreal(const vec3 x) { return x / (x + 0.155) * 1.019; }
+vec3  blendDifference(in vec3 base, in vec3 blend) { return abs(base-blend); }
+float map(float v, float iMin, float iMax ) { return (v-iMin)/(iMax-iMin); }
+float map1(in float v, in float iMin, in float iMax, in float oMin, in float oMax) { return oMin + (oMax - oMin) * (v - iMin) / (iMax - iMin); }
+
     void main(){
 
       float dist = 1. - length(gl_PointCoord.xy - vec2(0.5));
@@ -139,13 +139,30 @@ export const frag = /* glsl */ `
       vec3 newPos = vPos;
       vec3 newNormal = vNormal;
 
+      float angle = atan(vNormal.x, vNormal.y);
+
       vec3 noisePos = abs(snoise3(newNormal * 1.  )) ;
-      float n = snoise(newNormal *0.85 + uTime *0.1 ) ;
+      float n = snoise(newNormal *0.85  + uTime *0.2 )  ;
       float sat = map(abs(n), 0.,.25);
-      float hue =  map1(n, 0.,1.,0.525,0.585);
-      vec3 convert = hsv2rgb(vec3(0.555, sat, .5));
-      vec3 col = tonemapFilmic(convert);
-      col *= pow(col, vec3(0.4545));
+      
+      float sat1 = map(abs(n), 0.1,.25);
+      float hueB = map(abs(n), 0.5,0.6);
+      float hueR = map(abs(n), 0.7,0.8);
+      float fHue = mix(hueB, hueR, n);
+
+      float hue = mix(0.6, 0.05, map(abs(n), 0.0, 1.0));
+      
+      
+      float mhr = map1(n, 0.,1.,0.1,0.05);
+      vec3 cr = hsl2rgb(vec3(mhr, sat, .35));
+
+      float mhb = map1(n, 0.,1.,0.5,0.6);
+      vec3 cb = hsl2rgb(vec3(mhb, sat, .35));
+
+      vec3 fcol = mix(cb, cr, map(abs(n), 0.0, 1.0));
+
+      vec3 convert = hsl2rgb(vec3(hue, sat, .35));
+      vec3 col = tonemapFilmic(cr);
 
       // float diff = max(dot(nPos, nLight),0.);
       // c *= diff;

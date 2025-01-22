@@ -142,11 +142,10 @@ export const frag = /* glsl */ `
       vec3 noisePos = abs(snoise3(newNormal * 1.  )) ;
       float n = snoise(newNormal *0.85 + uTime *0.1 ) ;
       float sat = map(abs(n), 0.,.25);
-      float hue =  map1(n, 0.,1.,0.525,0.585);
+      // float hue =  map1(n, 0.,1.,0.525,0.585);
       vec3 convert = hsv2rgb(vec3(0.555, sat, .5));
       vec3 col = tonemapFilmic(convert);
       col *= pow(col, vec3(0.4545));
-
       // float diff = max(dot(nPos, nLight),0.);
       // c *= diff;
       gl_FragColor = vec4(col,1.);
