@@ -11,7 +11,7 @@ const Layout = ({
   return (
     <>
       <Nav paths={paths} />
-      <main className="absolute top-0 left-0 w-screen h-screen ">
+      <main className="absolute top-0 left-0 w-screen h-screen">
         <Outlet />
       </main>
     </>

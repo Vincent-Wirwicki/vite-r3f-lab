@@ -34,9 +34,8 @@ export function BustModel(props: JSX.IntrinsicElements["group"]) {
     []
   );
 
-  useFrame(({ clock, camera }) => {
+  useFrame(({ clock }) => {
     matRef.current.uniforms.uTime.value = clock.getElapsedTime();
-    console.log(camera.position);
   });
 
   return (
@@ -68,7 +67,7 @@ export function BustModel(props: JSX.IntrinsicElements["group"]) {
         </mesh>
       </group>
       {/* BACKGROUND */}
-      <mesh scale={15} rotation={[0, Math.PI, 0]}>
+      <mesh scale={10} rotation={[0, Math.PI, 0]}>
         <sphereGeometry />
         <shaderMaterial
           ref={matRef}
