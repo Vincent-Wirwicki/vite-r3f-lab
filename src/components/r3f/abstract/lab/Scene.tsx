@@ -5,91 +5,41 @@ import { vert } from "./shader/vert";
 import { frag } from "./shader/frag";
 import { Mesh, MeshStandardMaterial, ShaderMaterial } from "three";
 // import { BustModel } from "./model/BustModel";
-import { GLTF } from "three-stdlib";
+// import { GLTF } from "three-stdlib";
 // import { Mesh, Points as P } from "three";
 
 const Scene = () => {
+
+  const cylHelix = () => {
+    const t = 1
+    const x = Math.cos(t)
+    const y = Math.sin(t)
+    const z = t
+  
+  }
+
   return (
-    <Canvas>
-      <pointLight castShadow intensity={2} position={[1, 1, 2]} color="#fff" />
-      <pointLight
-        castShadow
-        intensity={2}
-        position={[-1, -1, 2]}
-        color="#fff"
-      />
+    <Canvas shadows>
+      <pointLight castShadow intensity={4} position={[0, 1, 2]} color="#fff" />
+      {/* <pointLight castShadow intensity={2} position={[0, 0, 2]} color="#fff" /> */}
+
+      <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
+        <boxGeometry />
+        <meshBasicMaterial toneMapped={true} color="red" />
+      </mesh>
+      <mesh
+        position={[0, -0.1, 0]}
+        rotation={[Math.PI * -0.5, 0, 0]}
+        receiveShadow
+      >
+        <planeGeometry args={[10, 10, 1, 1]} />
+        <meshStandardMaterial />
+      </mesh>
 
       {/* <Particles /> */}
-      <BustModel />
       <OrbitControls />
     </Canvas>
   );
 };
-
-type GLTFResult = GLTF & {
-  nodes: {
-    marble_bust_01: Mesh;
-  };
-  materials: {
-    marble_bust_01: MeshStandardMaterial;
-  };
-  // animations: GLTFAction[]
-};
-const BustModel = () => {
-  const { nodes } = useGLTF("/model/bust/marble_bust_01_1k.gltf") as GLTFResult;
-  const texture = useTexture(
-    "/model/bust/textures/marble_bust_01_nor_gl_1k.jpg"
-  );
-  // materials
-  const matRef = useRef<ShaderMaterial>(null!);
-
-  const shader = useMemo(
-    () => ({
-      uniforms: { uTime: { value: 0 }, uDiffuse: { value: texture } },
-      vert: vert,
-      frag: frag,
-    }),
-    [texture]
-  );
-
-  useFrame(({ clock }) => {
-    matRef.current.uniforms.uTime.value = clock.getElapsedTime();
-  });
-
-  return (
-    <group dispose={null}>
-      <Center>
-        <mesh
-          scale={10}
-          castShadow
-          geometry={nodes.marble_bust_01.geometry}
-          // material={materials.marble_bust_01}
-          position={[0, 0.2, 0.15]}
-        >
-          <shaderMaterial
-            ref={matRef}
-            attach="material"
-            uniforms={shader.uniforms}
-            fragmentShader={shader.frag}
-            vertexShader={shader.vert}
-            transparent
-            // wireframe
-          />
-        </mesh>
-        {/* <mesh
-          scale={10.8}
-          castShadow
-          geometry={nodes.marble_bust_01.geometry}
-          // material={materials.marble_bust_01}
-          position={[0, 0.2, 0.15]}
-        >
-          <MeshTransmissionMaterial transmission={1} />
-        </mesh> */}
-      </Center>
-    </group>
-  );
-};
-
-useGLTF.preload("/model/bust/marble_bust_01_1k.gltf");
 
 export default Scene;

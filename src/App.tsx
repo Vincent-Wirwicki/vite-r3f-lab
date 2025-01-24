@@ -14,6 +14,7 @@ const App = () => {
     { path: "/bg-color-2", title: "bg-color-2" },
     { path: "/bg-color-3", title: "bg-color-3" },
     { path: "/lab", title: "lab" },
+    { path: "/lab-part", title: "lab-part" },
     { path: "/fibo-loop-1", title: "fibo sphere 1" },
     { path: "/fibo-loop-2", title: "fibo sphere 2" },
     { path: "/fibo-loop-3", title: "fibo sphere 3" },
@@ -63,6 +64,10 @@ const App = () => {
         {
           path: "lab",
           lazy: () => import("./pages/abstract/lab/Page"),
+        },
+        {
+          path: "lab-part",
+          lazy: () => import("./pages/abstract/particles/Page"),
         },
         {
           path: "fibo-loop-1",
