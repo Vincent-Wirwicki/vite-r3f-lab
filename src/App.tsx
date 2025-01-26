@@ -20,6 +20,7 @@ const App = () => {
     { path: "/fibo-loop-3", title: "fibo sphere 3" },
     { path: "/3d-model-01", title: "3d mod 1" },
     { path: "/spiral-wave", title: "spiral wave" },
+    { path: "/catenoid", title: "catenoid 1" },
   ];
 
   // routing
@@ -88,6 +89,10 @@ const App = () => {
         {
           path: "spiral-wave",
           lazy: () => import("./pages/loop/wave/demo1/Page"),
+        },
+        {
+          path: "catenoid",
+          lazy: () => import("./pages/loop/catenoid/demo1/Page"),
         },
       ],
     },
