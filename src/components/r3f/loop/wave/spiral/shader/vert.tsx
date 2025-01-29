@@ -60,7 +60,7 @@ vec3 rotateX(vec3 position, float angle) {
 
         float offset = (angle / 2. * PI) * dist*2.;
 
-        float waveAmp = exp(1. - dist * .5);
+        float waveAmp = exp(1. - dist * .75);
         // float waveAmp = 1. / (dist * 10.01) * 0.15;
         float wave = sin(dist * freq - waveMod + angle * 2.) * 0.25 * waveAmp ;
         

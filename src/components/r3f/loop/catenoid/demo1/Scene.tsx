@@ -22,7 +22,7 @@ const Scene = () => {
       <directionalLight position={[0, 2, 0]} />
       {/* <pointLight position={[0, 2, 0]} intensity={1} /> */}
       <Particles />
-      <mesh rotation={[-Math.PI * 0.5, 0, 0]} position={[0, -0.5, 2]}>
+      <mesh rotation={[-Math.PI * 0.5, 0, 0]} position={[0, -0.5, -2]}>
         <planeGeometry args={[20, 10]} />
         <MeshReflectorMaterial
           mirror={1}
