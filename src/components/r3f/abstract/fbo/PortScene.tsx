@@ -44,7 +44,7 @@ const PortScene = () => {
 
       const x = Math.random() * r1 - r2;
       const y = Math.random() * r1 - r2;
-      const z = 0;
+      const z = Math.random() * r1 - r2;
 
       data[stride] = x;
       data[stride + 1] = y;
@@ -57,14 +57,20 @@ const PortScene = () => {
   // DATA POINT TEXTURE --------------
   const dataTex = useMemo(
     () =>
-      new DataTexture(getPlane(size, 4, 2), size, size, RGBAFormat, FloatType),
+      new DataTexture(getPlane(size, 2, 1), size, size, RGBAFormat, FloatType),
     []
   );
   dataTex.needsUpdate = true;
 
   const offsetTex = useMemo(
     () =>
-      new DataTexture(getPlane(size, 2, 1), size, size, RGBAFormat, FloatType),
+      new DataTexture(
+        getPlane(size, 1, 0.5),
+        size,
+        size,
+        RGBAFormat,
+        FloatType
+      ),
     []
   );
 

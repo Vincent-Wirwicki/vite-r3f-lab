@@ -42,8 +42,8 @@ const PortScene = () => {
     for (let i = 0; i < size; i++) {
       const stride = i * 4;
 
-      const x = Math.random() * 8 - 4;
-      const y = Math.random() * 8 - 4;
+      const x = Math.random() * 2 - 1;
+      const y = Math.random() * 2 - 1;
       const z = 0;
 
       data[stride] = x;
