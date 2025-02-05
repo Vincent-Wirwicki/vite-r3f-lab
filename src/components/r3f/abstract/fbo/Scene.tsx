@@ -2,16 +2,17 @@ import { MeshReflectorMaterial, OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 
 import PortScene from "./PortScene";
+import { Vector3 } from "three";
 
 const finalScene = () => {
   return (
-    <Canvas camera={{ position: [1.8, -0.2, 3.45] }}>
+    <Canvas camera={{ position: [0, -2.8, 0] }}>
       <color attach="background" args={["black"]} />
       {/* <LinesFibo MeshReflectorMaterial/> */}
       <PortScene />
       {/* <ambientLight intensity={0.5} />
-      <directionalLight position={[0, 2, 0]} />
-      <mesh rotation={[-Math.PI * 0.5, 0, 0]} position={[0, -0.5, 2]}>
+      <directionalLight position={[0, 2, 0]} /> */}
+      {/* <mesh rotation={[0, 0, 0]} position={[0, -0.5, 2]}>
         <planeGeometry args={[20, 20]} />
         <MeshReflectorMaterial
           mirror={1}

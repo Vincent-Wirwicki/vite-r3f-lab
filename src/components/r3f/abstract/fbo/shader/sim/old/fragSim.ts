@@ -69,11 +69,7 @@ export const fragSim = /* glsl */ `
         const float divisor = 1.0 / ( 2.0 * e );
         return normalize( vec2(x, y) * divisor );
       }
-vec2 srandom2(in vec2 st) {
-    const vec2 k = vec2(.3183099, .3678794);
-    st = st * k + k.yx;
-    return -1. + 2. * fract(16. * k * fract(st.x * st.y * (st.x + st.y)));
-}
+
       float map(in float v, in float iMin, in float iMax, in float oMin, in float oMax) { return oMin + (oMax - oMin) * (v - iMin) / (iMax - iMin); }
 vec3 noised (in vec2 p) {
     // grid
@@ -84,10 +80,10 @@ vec3 noised (in vec2 p) {
     vec2 u = f * f * f * (f * (f * 6. - 15.) + 10.);
     vec2 du = 30. * f * f * (f * (f - 2.) + 1.);
 
-    vec2 ga = srandom2(i + vec2(0., 0.));
-    vec2 gb = srandom2(i + vec2(1., 0.));
-    vec2 gc = srandom2(i + vec2(0., 1.));
-    vec2 gd = srandom2(i + vec2(1., 1.));
+    vec2 ga = snoise2(i + vec2(0., 0.));
+    vec2 gb = snoise2(i + vec2(1., 0.));
+    vec2 gc = snoise2(i + vec2(0., 1.));
+    vec2 gd = snoise2(i + vec2(1., 1.));
 
     float va = dot(ga, f - vec2(0., 0.));
     float vb = dot(gb, f - vec2(1., 0.));
@@ -116,51 +112,64 @@ float terrain( in vec2 p )
     }
     return a;
 }
+
+    vec3 thomas(vec3 pos, float t){   
+      const float b = 0.19;
       
+      vec3 target = vec3(0); 
+      float x = pos.x;
+      float y = pos.y;
+      float z = pos.z;
+
+      target.x = -b*x + sin(y) ;
+      target.y = -b*y + sin(z) ;
+      target.z = -b*z + sin(x) ;   
+      
+      return target * t;
+    }
+
+    vec3 thomasD1(vec3 pos, float t){   
+      const float b = 0.19;
+      
+      vec3 target = vec3(0); 
+      float x = pos.x;
+      float y = pos.y;
+      float z = pos.z;
+
+      target.x = -b*x - cos(y) ;
+      target.y = -b*y - cos(z) ;
+      target.z = -b*z - cos(x) ;   
+      
+      return target * t;
+    }
+
+    float map1(float v, float iMin, float iMax ) { return (v-iMin)/(iMax-iMin); }
+  
     void main(){
       vec2 uv = vUv;
       float time = mod(mod(uTime *0.15, 1.0) + 1.0, 1.0);
-      float time2 = mod(mod(uTime, 1.0) + 1.0, 1.0);
-
       float repeat = sin(time * 2. * PI);
       vec4 pos = texture2D( uPositions, uv );
       vec4 offset = texture2D(uOffset, uv);
-      vec3 ip = pos.xyz;
-
-
+      float dist = length(pos);
+      vec4 q1 = pos;
       
-      // vec2 noiseDer = curl(pos.xy);
-      float fr = map(repeat, -1.,1.,.15,.5);
-      // vec2 gradient = normalize(noiseDer.yz); - vec2( uTime*0.1, 0.)
-      float x  = cos((pos.x - time )* 2. * PI) * fr;
-      float y = sin((pos.y )* 2. * PI);
-      
-      float tern = terrain(pos.xy + vec2(0., time *4. * PI )) ;
-      vec2 velocity = offset.xy;
-      float test = normalize(tern);
-      velocity.x *=  0.05 * test ;
+      float noise = snoise(pos.xy);
+      float reset = map1(time, 3.,6.);
 
-      // pos.x += velocity.x;
-      // if(pos.x >= -0.75 || pos.x <= -.15) pos.x = ip.x  ;
-      pos.y += velocity.x;
-      if(pos.y >= -0.25 || pos.y <= -1.) pos.y = ip.y ;
-      // if(pos.y >= -0.15 || pos.y <= -.75) pos.y = ip.y  ;
-      float bounds = smoothstep(1.,0.,abs(pos.x))*smoothstep(0.5,0., abs(pos.y));
-      float bend = pos.x * pos.x  + pos.y * pos.y ;
-      float start = mix(0.45,0.65,repeat);
-      // float start = mix(0.015,0.25,repeat);
+      // pos /= reset;
 
-      float end =  map(repeat, -1.,1., 0.5, -.5);
+      // vec3 target = thomas(pos.xyz - reset, 0.05);
+      float nnn = snoise3(pos.xyz) *0.1;
+      float mapNoise = map(nnn, -1.,1.,0.5,nnn);
 
-      pos.z = tern * smoothstep(start,0.,length(pos.x - mix(0.25,0.95,repeat) ));
+      vec3 np = normalize(pos.xyz);
+      vec3 target =  thomas(pos.xyz , 0.09 * offset.x  ) ;
+      vec3 off =  thomasD1(offset.xyz, pos.x);
 
+      pos.xyz += nt * 0.1 ;
 
-      // if(pos.x >= 0.5) pos.x = ip.x;
-      // pos.z -= velocity.y;
-// pos.z = trn * offset.x ;  // Move in curl direction
-      // constrain
-      // pos.xy *= smoothstep(0.5, 0.49,abs(uv - 0.5));
-      gl_FragColor = vec4( pos);
+      gl_FragColor = vec4(pos);
 
 
     }
