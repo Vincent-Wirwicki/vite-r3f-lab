@@ -132,20 +132,6 @@ const PortScene = () => {
             vertexShader={shaderSim.vertex}
           />
           <planeGeometry args={[2, 2]} />
-          {/* <bufferGeometry>
-            <bufferAttribute
-              attach="attributes-position"
-              count={positions.length / 3}
-              array={positions}
-              itemSize={3}
-            />
-            <bufferAttribute
-              attach="attributes-uv"
-              count={uvs.length / 2}
-              array={uvs}
-              itemSize={2}
-            />
-          </bufferGeometry> */}
         </mesh>,
         scene
       )}

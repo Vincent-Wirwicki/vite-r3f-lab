@@ -18,6 +18,18 @@ export const fragSim = /* glsl */ `
     //               https://github.com/ashima/webgl-noise
     //
 
+    // ---------------------------------------------------------------------------------
+    //
+    // Description : Array and textureless GLSL 2D/3D/4D simplex
+    //               noise functions.
+    //      Author : Ian McEwan, Ashima Arts.
+    //  Maintainer : ijm
+    //     Lastmod : 20110822 (ijm)
+    //     License : Copyright (C) 2011 Ashima Arts. All rights reserved.
+    //               Distributed under the MIT License. See LICENSE file.
+    //               https://github.com/ashima/webgl-noise
+    //
+
       vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
 
       float snoise(vec2 v){
@@ -141,62 +153,32 @@ float terrain( in vec2 p )
     void main(){
       vec2 uv = vUv;
       float time = mod(mod(uTime *0.15, 1.0) + 1.0, 1.0);
-      float time2 = mod(mod(uTime*0.5, 1.0) + 1.0, 1.0);
+      float time2 = mod(mod(uTime, 1.0) + 1.0, 1.0);
 
       float repeat = sin(time * 2. * PI);
       vec4 pos = texture2D( uPositions, uv );
       vec4 offset = texture2D(uOffset, uv);
       vec3 ip = pos.xyz;
       
-      // float freq = map(time2, 0.,1., 2.15, 1.75);
-      // vec2 noise = snoise2(pos.xy * freq + vec2(0., 0.)) *2. * PI ;
-
-      // // float mapNoise = map(noise, -1.,1.,-1.,1.);
-      // vec2 flow = vec2(cos(noise.x) , sin(noise.y  )  );
-
-      // vec2 velocity = offset.xy  ;
-      // vec2 nv = normalize(velocity);
-
-      // velocity *= flow *0.09   ;
-      // pos.xy += velocity*0.15    ;
-      //       // pos.z = nv.x *0.01;
-
-      // pos.xy = mod(pos.xy, 1. );
-
+      float freq = map(time, 0.,1., 9.15,8.75);
       float noise = terrain(pos.xy *9.15 + vec2(0.)) *2. * PI ;
 
-float mapNoise = map(noise, -1.,1.,-1.,1.);
-vec2 flow = vec2(cos(noise ) , sin(noise ) );
+      float mapNoise = map(noise, -1.,1.,-1.,1.);
+      vec2 flow = vec2(cos(noise + repeat), sin(noise + repeat) );
 
-vec2 velocity = offset.xy  ;
-vec2 nv = normalize(velocity);
+      vec2 velocity = offset.xy  ;
+      vec2 nv = normalize(velocity);
 
-velocity *= flow *0.09   ;
-pos.xy += velocity*0.15    ;
-pos.xy = mod(pos.xy, 1. );
+      velocity *= flow *0.09   ;
+      pos.xy += velocity*0.15    ;
+      pos.xy = mod(pos.xy, 1. );
 
-gl_FragColor = vec4( pos);
-
+      gl_FragColor = vec4( pos);
 
 
     }
 
 `;
-//  flow 1
-// float noise = terrain(pos.xy *9.15 + vec2(0.)) *2. * PI ;
-
-// float mapNoise = map(noise, -1.,1.,-1.,1.);
-// vec2 flow = vec2(cos(noise + repeat) , sin(noise + repeat) );
-
-// vec2 velocity = offset.xy  ;
-// vec2 nv = normalize(velocity);
-
-// velocity *= flow *0.09   ;
-// pos.xy += velocity*0.15    ;
-// pos.xy = mod(pos.xy, 1. );
-
-// gl_FragColor = vec4( pos);
-
 // vec2 flow = vec2(cos(noise *2. * PI ), sin(noise*2. * PI));
 // float x = map(flow.x, -1.,1.,-2.,1.);
 // float y = map(flow.y, -1.,1.,-2.,1.);

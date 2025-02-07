@@ -64,7 +64,13 @@ const PortScene = () => {
 
   const offsetTex = useMemo(
     () =>
-      new DataTexture(getPlane(size, 4, 2), size, size, RGBAFormat, FloatType),
+      new DataTexture(
+        getPlane(size, 1, 0.5),
+        size,
+        size,
+        RGBAFormat,
+        FloatType
+      ),
     []
   );
 

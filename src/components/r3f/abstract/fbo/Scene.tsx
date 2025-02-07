@@ -1,30 +1,42 @@
-import { MeshReflectorMaterial, OrbitControls } from "@react-three/drei";
+import {
+  // MeshPortalMaterial,
+  MeshReflectorMaterial,
+  OrbitControls,
+} from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 
 import PortScene from "./PortScene";
-import { Vector3 } from "three";
+import { DoubleSide, Vector3 } from "three";
 
 const finalScene = () => {
   return (
-    <Canvas camera={{ position: [0, -2.8, 0] }}>
+    <Canvas
+      camera={{
+        position: [0.41, 0.5, 2],
+        lookAt: () => new Vector3(0, 0, 0),
+      }}
+    >
       <color attach="background" args={["black"]} />
       {/* <LinesFibo MeshReflectorMaterial/> */}
+
       <PortScene />
-      {/* <ambientLight intensity={0.5} />
-      <directionalLight position={[0, 2, 0]} /> */}
-      {/* <mesh rotation={[0, 0, 0]} position={[0, -0.5, 2]}>
-        <planeGeometry args={[20, 20]} />
+
+      <ambientLight intensity={5} />
+      <directionalLight position={[0, 2, 0]} />
+      {/* <mesh rotation={[Math.PI * -0.5, 0, 0]} position={[2, 0, 0]}>
+        <planeGeometry args={[20, 20, 20, 20]} />
         <MeshReflectorMaterial
           mirror={1}
           // blur={[400, 100]}
           resolution={1024}
           // mixBlur={1}
           mixStrength={15}
-          // depthScale={1}
+          depthScale={1}
           minDepthThreshold={0.15}
           color="#151515"
           metalness={0.6}
           roughness={1}
+          side={DoubleSide}
         />
       </mesh> */}
       <OrbitControls />
