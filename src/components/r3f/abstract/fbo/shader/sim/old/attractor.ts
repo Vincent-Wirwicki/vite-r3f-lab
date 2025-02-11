@@ -113,7 +113,7 @@ float terrain( in vec2 p )
     return a;
 }
 
-    vec3 thomas(vec3 pos, float t){   
+    vec3 thomas(vec3 pos, float t, float c){   
       const float b = 0.19;
       
       vec3 target = vec3(0); 
@@ -121,9 +121,9 @@ float terrain( in vec2 p )
       float y = pos.y;
       float z = pos.z;
 
-      target.x = -b*x + sin(y) ;
-      target.y = -b*y + sin(z) ;
-      target.z = -b*z + sin(x) ;   
+      target.x = -c*x + sin(y) ;
+      target.y = -c*y + sin(z) ;
+      target.z = -c*z + sin(x) ;   
       
       return target * t;
     }
@@ -136,14 +136,12 @@ float terrain( in vec2 p )
       float y = pos.y;
       float z = pos.z;
 
-      target.x = -b*x - cos(y) ;
-      target.y = -b*y - cos(z) ;
-      target.z = -b*z - cos(x) ;   
+      target.x = -b + cos(y) ;
+      target.y = -b + cos(z) ;
+      target.z = -b + cos(x) ;   
       
       return target * t;
     }
-
-
     
     vec3 thomasD2(vec3 pos, float t){   
       const float b = 0.19;
@@ -179,28 +177,30 @@ float terrain( in vec2 p )
 
       // vec3 target = thomas(pos.xyz - reset, 0.05);
       vec3 np = normalize(pos.xyz);
-      vec3 target =  thomas(pos.xyz   , 0.001) ;
-      vec3 off =  thomasD1(pos.xyz,0.05);
+      float test = map(repeat, -1.,1.,0.19,0.16);
+      float test2 = map(repeat, -1.,1.,offset.x *0.1,offset.x*0.5);
 
+      vec3 target =  thomas(pos.xyz, test2, test) ;
+      vec3 d1 =  thomasD1(pos.xyz,offset.x);
+      vec3 d2 =  thomasD1(pos.xyz,offset.x);
+      
+      vec3 nt1 = normalize(target);
+      vec3 nd1 = normalize(d1);
+      vec3 nd2 = normalize(d2);
+      vec3 bi = normalize(cross(nt1,nd2));
 
-      vec3 nt = normalize(target);
-      vec3 no = normalize(off);
-      vec3 k = normalize(cross(nt, no));
+      // vec3 nt = normalize(target);
+      // vec3 no = normalize(off);
+      // vec3 k = normalize(cross(nt, no));
       
       float cx = cos(time  * PI) ;
       float cy = sin(time  * PI) ;
       // target = nt *0.1 * cx + no *0.1 ;
       // target -= pos.xyz + off   ;
       // float str = map(repeat, -2.,2.,.25,3.);
+      float speed = map(repeat, -1.,1.,0.1,0.25);
 
-      for(int i =0; i < 3; i++){
-        float ii = float(i);
-        float str = map(repeat * ii, -1.,1.,.25,2.5);
-        // pos.xyz +=( (nt * str) -0.5) * ii +0.5;
-        pos.xyz +=(nt * str) ;
-        // pos.xyz = (target.xyz -0.5) * (ii*1.) + 0.5;
-      }
-
+      pos.xyz += target ;
 
 
       gl_FragColor = vec4(pos);

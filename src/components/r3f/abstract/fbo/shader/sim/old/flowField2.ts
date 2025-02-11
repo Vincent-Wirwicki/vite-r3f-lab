@@ -172,13 +172,30 @@ vec3 twist(vec3 p, float twistAmount){
       vec4 pos = texture2D( uPositions, uv );
       vec4 offset = texture2D(uOffset, uv);
       vec3 ip = pos.xyz;
-      float circle = sdCircle(pos.xy - vec2(time), time);
+      float c = sdCircle(pos.xy - 0.5, 0.5);
+      float freq = map(time, 0.,1., 9.15,8.75);
+      float noise = terrain(pos.xy *9.15 ) *2. * PI ;
       float dist = length(pos.xy);
-      float angle = atan(pos.x, pos.y);
+      float force = smoothstep(0.5,0.1,dist);
 
-      float spiral = dist + angle;
+      float logSpiral = log(dist -0.5) / 8. + atan(pos.x, pos.y);
+      float animSpiral = sin(time * 2. * PI  + logSpiral *4. );
 
-      pos.xy -= spiral;
+      vec2 vrt = vortex(pos.xy )    ;
+
+      vec2 cn = curl(pos.xy *2.  ) *2. * PI;
+
+
+      vec2 flow = vec2(sin(cn.x - vrt.x ) * dist, sin(cn.y - vrt.y  ) *dist   );
+      float ease = map(repeat, -1.,1.,0.45,0.65);
+      vec2 vort = vortex(cn.xy )  ;
+      vec2 velocity = offset.xy   ;
+      vec2 nv = normalize(flow);
+      vec3 tt = twist(pos.xyz,2.);
+      velocity *=  tt.xy ;
+      pos.xy += velocity*0.15  ;
+      // pos.z = flow.x *0.01;
+      pos.xyz = mod(pos.xyz, 1. );
 
       gl_FragColor = vec4( pos);
 

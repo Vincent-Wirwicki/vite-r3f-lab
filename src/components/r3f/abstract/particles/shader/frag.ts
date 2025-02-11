@@ -70,17 +70,10 @@ vec3 tonemapFilmic(vec3 v) {
       vec3 nPos = normalize(vPos - 0.5);
       float dis = length(vPos);
       // vec3 col = mix(vec3(vPos.x,0.455,0.0), vec3(0.955,vPos.y,0.), vPos.x * vTime*vTime);
-      vec3 col = mix(vPos -0.5, vec3(0.,0.,0.),  vTime*vTime);
-      float luminance = dot(vPos.rgb, vec3(0.2126, 0.7152, 0.0722));
 
-    
-      float s = smoothstep(-1.,1.,sin(vPos.x * vPos.y));
-      vec3 spec = spectral_soft(luminance * vTime);
-      vec3 test = hue2rgb(dis * 2.);
-      vec3 tone = tonemapACES((spec ));
       // tone = max(tone - (0.0001 + tone*0.004)*.5, 0.);
 
-      gl_FragColor = vec4(vec3( (tone *0.5) + .15),1.);
+      gl_FragColor = vec4(vec3( 1.),1.);
       // gl_FragColor = vec4(vec3(.5),alpha);
 
     }

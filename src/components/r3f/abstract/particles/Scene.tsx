@@ -1,13 +1,7 @@
-import {
-  MeshReflectorMaterial,
-  OrbitControls,
-  PerspectiveCamera,
-  Points,
-  RenderTexture,
-} from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
-import { AdditiveBlending, ShaderMaterial, Vector3 } from "three";
+import { AdditiveBlending, ShaderMaterial } from "three";
 import { vert } from "./shader/vert";
 import { frag } from "./shader/frag";
 
@@ -15,29 +9,12 @@ const Scene = () => {
   return (
     <Canvas camera={{ position: [0, 0.85, 5] }}>
       <color attach="background" args={["black"]} />
-      {/* <fog attach="fog" args={["#17171b", 100, 30]} /> */}
-
-      {/* <color attach="background" args={["#BF0426"]} /> */}
       <ambientLight intensity={0.5} />
       <directionalLight position={[0, 2, 0]} />
-      {/* <pointLight position={[0, 2, 0]} intensity={1} /> */}
       <Particles />
-      <mesh rotation={[-Math.PI * 0.5, 0, 0]} position={[0, -0.5, 2]}>
-        <planeGeometry args={[20, 10]} />
-        <MeshReflectorMaterial
-          mirror={1}
-          // blur={[400, 100]}
-          resolution={1024}
-          // mixBlur={1}
-          mixStrength={15}
-          // depthScale={1}
-          minDepthThreshold={0.15}
-          color="#151515"
-          metalness={0.6}
-          roughness={1}
-        />
+      <mesh>
+        <torusGeometry /> <meshStandardMaterial />
       </mesh>
-      {/* <LinesFibo /> */}
       <OrbitControls />
     </Canvas>
   );
@@ -46,24 +23,33 @@ const Scene = () => {
 export default Scene;
 
 const Particles = () => {
-  const COUNT = 100000;
+  const COUNT = 3000;
   const matRef = useRef<ShaderMaterial>(null!);
 
   const pos = useMemo(() => {
     const pos = new Float32Array(COUNT * 3);
-    const c = 3; // Scale factor for the catenoid
 
     for (let i = 0; i < COUNT; i++) {
-      const v = (i / COUNT) * 2 - 1; // Map `v` to a range
-      const u = (i % 360) * (Math.PI / 180); // Convert angle to radians
-
-      const x = c * Math.cosh(v / c) * Math.cos(u);
-      const y = c * Math.cosh(v / c) * Math.sin(u);
-      const z = v;
+      const x = Math.random() * 2 - 1;
+      const y = Math.random() * 2 - 1;
+      const z = Math.random() * 2 - 1;
 
       pos.set([x, y, z], i * 3);
     }
     return pos;
+  }, []);
+
+  const speed = useMemo(() => {
+    const speed = new Float32Array(COUNT * 3);
+
+    for (let i = 0; i < COUNT; i++) {
+      const x = Math.random();
+      const y = Math.random();
+      const z = Math.random();
+
+      speed.set([x, y, z], i * 3);
+    }
+    return speed;
   }, []);
 
   const shader = useMemo(
@@ -80,38 +66,36 @@ const Particles = () => {
   });
 
   return (
-    <mesh position={[0, 1, 0]}>
-      <planeGeometry args={[8, 3]} />
-
-      <meshStandardMaterial>
-        <RenderTexture attach={"map"} anisotropy={16}>
-          <PerspectiveCamera
-            makeDefault
-            manual
-            aspect={1 / 1}
-            position={[0, 0.25, 10]}
-            lookAt={() => new Vector3(0, 0, 0)}
-          />
-          <color attach="background" args={["#262626"]} />
-          <Points
-            positions={pos}
-            // scale={[2, 2, 2]}
-            rotation={[0, Math.PI * 0.5, 0]}
-          >
-            <shaderMaterial
-              ref={matRef}
-              uniforms={shader.uniforms}
-              fragmentShader={shader.fragment}
-              vertexShader={shader.vertex}
-              transparent={false}
-              blending={AdditiveBlending}
-              depthWrite={false}
-              depthTest={false}
-            />
-          </Points>
-        </RenderTexture>
-      </meshStandardMaterial>
-    </mesh>
+    <points
+    // positions={pos}
+    // scale={[2, 2, 2]}
+    // rotation={[0, Math.PI * 0.5, 0]}
+    >
+      <shaderMaterial
+        ref={matRef}
+        uniforms={shader.uniforms}
+        fragmentShader={shader.fragment}
+        vertexShader={shader.vertex}
+        transparent={false}
+        blending={AdditiveBlending}
+        depthWrite={false}
+        depthTest={false}
+      />
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={pos.length / 3}
+          array={pos}
+          itemSize={3}
+        />
+        <bufferAttribute
+          attach="attributes-aSpeed"
+          count={speed.length / 3}
+          array={speed}
+          itemSize={3}
+        />
+      </bufferGeometry>
+    </points>
   );
 };
 

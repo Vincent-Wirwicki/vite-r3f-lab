@@ -4,23 +4,43 @@ export const vert = /*glsl*/ `
     varying float vTime ;
     varying vec3 vPos ;
 
+    attribute vec3 aSpeed;
+
     #define PI 3.141592653
 
 
     float map(in float v, in float iMin, in float iMax, in float oMin, in float oMax) { return oMin + (oMax - oMin) * (v - iMin) / (iMax - iMin); }
 
-
-    mat2 rotate2d(const in float r){
-      float c = cos(r);
-      float s = sin(r);
-      return mat2(c, s, -s, c);
+// Torus Position Function
+    vec3 torus(float u, float v) {
+        float R = 6.;
+        float r = .5;
+        return vec3(
+            (R + r * cos(v)) * cos(u),
+            (R + r * cos(v)) * sin(u),
+            r * sin(v)
+        );
     }
 
-    vec2 rotate2(in vec2 v, in float r, in vec2 c) {
-        return rotate2d(r) * (v - c) + c;
+    // Tangent to the torus along u (major circle)
+    vec3 torusTan(float u, float v) {
+        float R = 6.;
+        float r = 1.5;
+        return normalize(vec3(
+             -r * cos(v) * cos(u),
+        -r * cos(v) * sin(u),
+        -r * sin(v)
+        ));
     }
-    vec2 rotate(in vec2 v, in float r) {
-        return rotate2(v, r, vec2(.5));
+
+    // Second derivative: Normal direction to torus tube
+    vec3 torusD2(float u, float v) {
+        float r = .5;
+        return normalize(vec3(
+            -r * cos(v) * cos(u),
+            -r * cos(v) * sin(u),
+            -r * sin(v)
+        ));
     }
 
     void main(){
@@ -28,39 +48,23 @@ export const vert = /*glsl*/ `
     float time = mod(uTime * 0.15, 1.0);
     float stime = sin(time *2. * PI);
     vTime = stime;
+    vec3 pos = position;
+    float dt = fract(time + aSpeed.x);
+    float u = fract(time *0.5 + aSpeed.x) * 2. * PI;
+    float v = fract(time *1.2 + aSpeed.y) * 2. * PI;
 
-    float mu = map(position.y * stime,-1.,1.,position.y *2. -1., position.z *4. -2. );
-    float muX = map(position.x * stime,-1.,1.,position.x *2. -1., position.z -0.5 );
-    
-    float mv = map(position.z,0.,1.,0.15,position.z + .5);
-    // Parameters u and v for the surface
-    float u = position.y ; // Assume x holds the u coordinate
-    float v = position.z ; // Assume z holds the v coordinate
+    // pos += torus(u,v);
+    vec3 T = torusTan(u,v);
+    vec3 D2 = torusD2(u,v);
+    vec3 N = normalize(cross(T, D2));
 
-    // helicoid 
-    float x_heli =  mv * sin(muX);
-    float y_heli =  mv * cos(muX);
-    float z_heli = u;
-    vec3 heli = vec3(x_heli,y_heli,z_heli);
+    float angle = aSpeed.z * 2. * PI ;
+    vec3 offset = 6. * (cos(angle)* D2 + sin(angle)* N) ;
 
-    // Catenoid 
-    float x_cat = cosh(v) * cos(mu);
-    float y_cat = cosh(v) * sin(mu);
-    float z_cat = v;
-    vec3 cat = vec3(x_cat,y_cat,z_cat);
+    pos += offset ;
+    // newPos = torus(newPos);
     
-    vec3 newPos = mix(cat, heli, stime*stime);
-
-    float rot1 = map( stime ,-1.,1.,0., -.5);
-    float rot2 = map( stime * stime ,-1.,1.,1., -2.);
-    // newPos.yz = rotate(newPos.yz, rot1);
-    newPos.xy = rotate(newPos.xy, rot2);
-    
-    // newPos.z += zoom;
-    // newPos += mn;
-      vPos = newPos;
-    
-    vec4 mvPosition = modelViewMatrix * vec4(newPos, 1.0);
-    gl_PointSize = 30. * (1.0 / -mvPosition.z);
+    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+    gl_PointSize = 3. * (1.0 / -mvPosition.z);
     gl_Position = projectionMatrix * mvPosition;
     }`;

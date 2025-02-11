@@ -1,19 +1,18 @@
 import {
   // MeshPortalMaterial,
-  MeshReflectorMaterial,
   OrbitControls,
 } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 
 import PortScene from "./PortScene";
-import { DoubleSide, Vector3 } from "three";
+// import { Vector3 } from "three";
 
 const finalScene = () => {
   return (
     <Canvas
       camera={{
         position: [0.41, 0.5, 2],
-        lookAt: () => new Vector3(0, 0, 0),
+        // lookAt: () => new Vector3(0, 0, 0),
       }}
     >
       <color attach="background" args={["black"]} />

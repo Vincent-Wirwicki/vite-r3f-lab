@@ -44,12 +44,13 @@ const PortScene = () => {
 
       const x = Math.random() * r1 - r2;
       const y = Math.random() * r1 - r2;
-      const z = 1;
+      const z = Math.random() * r1 - r2;
+      const w = 1;
 
       data[stride] = x;
       data[stride + 1] = y;
       data[stride + 2] = z;
-      data[stride + 3] = 1;
+      data[stride + 3] = w;
     }
     return data;
   };
