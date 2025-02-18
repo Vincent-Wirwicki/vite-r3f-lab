@@ -16,7 +16,7 @@ export const vertRender = /* glsl */ `
         float diffuse = max(dot(diff, light),0.);
         vDiff = diffuse;
         // vDistance = -mvPosition.z;
-        gl_PointSize = 1. * (1./ -mvPosition.z);
+        gl_PointSize = 2. * (1./ -mvPosition.z);
         // gl_PointSize =  (1./ length(pos));
         gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1. );
     }

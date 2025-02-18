@@ -1,5 +1,7 @@
 export const fragSim = /* glsl */ `
     uniform sampler2D uPositions;
+    // uniform sampler2D uOffset;
+
     uniform float uTime;
     varying vec2 vUv;  
     #define PI 3.141592653
@@ -96,6 +98,8 @@ float fbm(in vec2 st) {
     void main(){
           vec2 uv = vUv;
         vec4 pos = texture2D( uPositions, uv );
+        // vec4 offset = texture2D( uPositions, uv );
+
         vec4 newPos = pos;
         float time = mod(mod(uTime *0.15, 1.0) + 1.0, 1.0);
         float repeat = sin(time *2. * PI);
@@ -103,17 +107,17 @@ float fbm(in vec2 st) {
         vec2 pixel = vec2(1./512., 1./512.);
 
         //  params
-        const float fluid_dt = 0.15;
-        const float fluid_visco = 0.03;
-        const float fluid_decay = 1e-6;
-        const float fluid_vorty = 0.1;
+        float fluid_dt = 0.15 * uTime ;
+        const float fluid_visco = 0.16;
+        const float fluid_decay = 5e-6;
+        const float fluid_vorty = 0.3;
 
         vec2 force = vec2(0.15,0.15);
 
         // divergeance
         const float k = 0.2;
-        const float s = k/fluid_dt;
-        const float dx = 1./512.;
+         float s = k/fluid_dt;
+        const float dx = 1.;
 
         vec4 d = texture2D( uPositions, uv );
         vec4 dR = texture2D( uPositions, uv + vec2(pixel.x,0.) );
@@ -158,7 +162,8 @@ float fbm(in vec2 st) {
         d.xy = clamp(d.xy, -0.999, 0.999);
         d.zw = clamp(d.zw,0.,1.);
        
-        // pos = d  ;
+        pos = d  ;
+        // pos = mod(pos, 1.);
 
 
         gl_FragColor = vec4(pos);

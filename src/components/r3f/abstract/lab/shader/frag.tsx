@@ -32,7 +32,7 @@ float gnoise(vec2 st) {
     float map(in float v, in float iMin, in float iMax, in float oMin, in float oMax) { return oMin + (oMax - oMin) * (v - iMin) / (iMax - iMin); }
 
     void main(){
-      float light = max(dot(vNormal, normalize(vec3(0.,1.,1.))),0.);
+      float light = max(dot(vNormal, normalize(vec3(0.,sin(uTime *0.5),1.))),0.);
       float time = mod(uTime * 0.75, 1.0);
 
       float mFreq = map(time,0.,1.,5.15,5.75);

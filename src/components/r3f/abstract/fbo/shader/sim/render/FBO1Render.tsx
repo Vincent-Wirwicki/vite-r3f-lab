@@ -11,10 +11,10 @@ import {
   FloatType,
   DataTexture,
 } from "three";
-import { vertSim } from "./shader/sim/vertSim";
-import { fragSim } from "./shader/sim/fragSim";
-import { vertRender } from "./shader/render/vertRender";
-import { fragRender } from "./shader/render/fragRender";
+import { vertSim } from "../vertSim";
+import { fragSim } from "../fragSim";
+import { vertRender } from "../../render/vertRender";
+import { fragRender } from "../../render/fragRender";
 
 const PortScene = () => {
   const size = 512;
@@ -36,24 +36,22 @@ const PortScene = () => {
   }, [size]);
 
   // DATA POINT ------------
-  const getSphere = (density: number, r: number) => {
+  const getPlane = (density: number, r1: number, r2: number) => {
     const size = density * density * 4;
     const data = new Float32Array(size);
     for (let i = 0; i < size; i++) {
       const stride = i * 4;
-
-      // theta varies from 0 to 2π, and phi varies from 0 to π.
       const theta = 2 * Math.PI * Math.random();
-      const phi = Math.acos(2 * Math.random() - 1);
-
-      const x = r * Math.sin(phi) * Math.cos(theta);
-      const y = r * Math.sin(phi) * Math.sin(theta);
-      const z = r * Math.cos(phi);
+      const r = Math.sqrt(Math.random() * r1 - r2); // Ensures uniform distribution
+      const x = r * Math.cos(theta);
+      const y = r * Math.sin(theta);
+      const z = 1;
+      const w = 1;
 
       data[stride] = x;
       data[stride + 1] = y;
       data[stride + 2] = z;
-      data[stride + 3] = 1;
+      data[stride + 3] = w;
     }
     return data;
   };
@@ -61,7 +59,13 @@ const PortScene = () => {
   // DATA POINT TEXTURE --------------
   const dataTex = useMemo(
     () =>
-      new DataTexture(getSphere(size, 10), size, size, RGBAFormat, FloatType),
+      new DataTexture(
+        getPlane(size, 1, 0.5),
+        size,
+        size,
+        RGBAFormat,
+        FloatType
+      ),
     []
   );
   dataTex.needsUpdate = true;

@@ -69,11 +69,7 @@ export const fragSim = /* glsl */ `
         const float divisor = 1.0 / ( 2.0 * e );
         return normalize( vec2(x, y) * divisor );
       }
-vec2 srandom2(in vec2 st) {
-    const vec2 k = vec2(.3183099, .3678794);
-    st = st * k + k.yx;
-    return -1. + 2. * fract(16. * k * fract(st.x * st.y * (st.x + st.y)));
-}
+
       float map(in float v, in float iMin, in float iMax, in float oMin, in float oMax) { return oMin + (oMax - oMin) * (v - iMin) / (iMax - iMin); }
 vec3 noised (in vec2 p) {
     // grid
@@ -84,10 +80,10 @@ vec3 noised (in vec2 p) {
     vec2 u = f * f * f * (f * (f * 6. - 15.) + 10.);
     vec2 du = 30. * f * f * (f * (f - 2.) + 1.);
 
-    vec2 ga = srandom2(i + vec2(0., 0.));
-    vec2 gb = srandom2(i + vec2(1., 0.));
-    vec2 gc = srandom2(i + vec2(0., 1.));
-    vec2 gd = srandom2(i + vec2(1., 1.));
+    vec2 ga = snoise2(i + vec2(0., 0.));
+    vec2 gb = snoise2(i + vec2(1., 0.));
+    vec2 gc = snoise2(i + vec2(0., 1.));
+    vec2 gd = snoise2(i + vec2(1., 1.));
 
     float va = dot(ga, f - vec2(0., 0.));
     float vb = dot(gb, f - vec2(1., 0.));
@@ -116,6 +112,54 @@ float terrain( in vec2 p )
     }
     return a;
 }
+
+    vec3 thomas(vec3 pos, float t ){   
+      const float b = 0.19;
+      
+      vec3 target = vec3(0); 
+      float x = pos.x;
+      float y = pos.y;
+      float z = pos.z;
+
+      target.x = -b*x + sin(y) ;
+      target.y = -b*y + sin(z) ;
+      target.z = -b*z + sin(x) ;   
+      
+      return target * t;
+    }
+
+    vec3 thomasD1(vec3 pos, float t){   
+      const float b = 0.19;
+      
+      vec3 target = vec3(0); 
+      float x = pos.x;
+      float y = pos.y;
+      float z = pos.z;
+
+      target.x = -b * x + cos(y) ;
+      target.y = -b * y + cos(z) ;
+      target.z = -b * z + cos(x) ;   
+      
+      return target * t;
+    }
+    
+    vec3 thomasD2(vec3 pos, float t){   
+      const float b = 0.19;
+      vec3 d1 = thomasD1(pos, t);
+      vec3 target = vec3(0); 
+      float x = pos.x;
+      float y = pos.y;
+      float z = pos.z;
+
+      target.x = -b * d1.x -sin(y) * d1.y ;
+      target.y = -b * d1.y -sin(z) * d1.z ;
+      target.z = -b * d1.z -sin(x) * d1.x ;   
+      
+      return target * t;
+    }
+
+    float map1(float v, float iMin, float iMax ) { return (v-iMin)/(iMax-iMin); }
+
       
     void main(){
       vec2 uv = vUv;
@@ -123,26 +167,40 @@ float terrain( in vec2 p )
       float repeat = sin(time * 2. * PI);
       vec4 pos = texture2D( uPositions, uv );
       vec4 offset = texture2D(uOffset, uv);
-      vec3 ip = pos.xyz;
-
-
+      float dist = length(pos);
+      vec4 q1 = pos;
       
-      // vec2 noiseDer = curl(pos.xy);
-      float fr = map(repeat, -1.,1.,4.,8.);
-      // vec2 gradient = normalize(noiseDer.yz);
-      float tern = terrain(pos.xy - vec2( uTime*0.1, 0.));
-      vec2 velocity = offset.xy;
-      velocity.x *= tern * 0.1;
-      // velocity.y *= noiseDer.x * 0.01;
-      pos.y += velocity.x;
-      pos.z = abs(tern) * smoothstep(.65,.75, abs(pos.y)) ;
-      if(pos.y >= 0.3 || pos.y <= -.3) pos.y = ip.y;
-      if(pos.x >= 0.5) pos.x = ip.x;
-      // pos.z -= velocity.y;
-// pos.z = trn * offset.x ;  // Move in curl direction
-      // constrain
-      // pos.xy *= smoothstep(0.5, 0.49,abs(uv - 0.5));
-      gl_FragColor = vec4( pos);
+      float noise = snoise(pos.xy);
+      float reset = map1(time, 3.,6.);
+
+      // pos /= reset;
+
+      // vec3 target = thomas(pos.xyz - reset, 0.05);
+      vec3 np = normalize(pos.xyz);
+      float test = map(repeat, -1.,1.,0.19,0.16);
+      float test2 = map(repeat, -1.,1.,offset.x *0.1,offset.x*0.5);
+      float tnoise = terrain(offset.xy);
+      vec3 target =  thomas(pos.xyz, offset.x*0.7);
+      vec3 d1 =  thomasD1(pos.xyz,offset.x*0.7);
+      vec3 d2 =  thomasD2(pos.xyz,offset.x*0.7);
+      
+      vec3 nt1 = normalize(target); //tang
+      vec3 nd1 = normalize(d1); // norm
+      vec3 nd2 = normalize(d2);
+      vec3 bi = normalize(cross(nt1,nd2));
+
+      // vec3 nt = normalize(target);
+      // vec3 no = normalize(off);
+      // vec3 k = normalize(cross(nt, no));
+      
+      float cx = cos(offset.y  * 2. *PI) ;
+      float cy = sin(offset.y  * 2. *PI) ;
+      pos.xyz -= (nt1 + bi   ) *2.* offset.y;
+
+      // pos = mod(pos, 2.* PI);
+      
+
+      gl_FragColor = vec4(pos);
 
 
     }

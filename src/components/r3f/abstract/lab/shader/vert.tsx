@@ -8,7 +8,9 @@ export const vert = /* glsl */ `
     #define PI 3.141592653
 
     void main(){
-      vNormal = normal;
+      // vNormal = normal;
+      vNormal = normalize(mat3(modelMatrix) *normal) ;
+
       vUv = uv;
       vec4 worldPos = modelMatrix * vec4(position, 1.);
       vec3 viewDir= normalize(worldPos.xyz - cameraPosition);

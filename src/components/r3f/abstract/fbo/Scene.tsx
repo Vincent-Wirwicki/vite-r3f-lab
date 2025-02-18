@@ -15,29 +15,18 @@ const finalScene = () => {
         // lookAt: () => new Vector3(0, 0, 0),
       }}
     >
-      <color attach="background" args={["black"]} />
+      <color attach="background" args={["#000"]} />
       {/* <LinesFibo MeshReflectorMaterial/> */}
 
       <PortScene />
-
-      <ambientLight intensity={5} />
-      <directionalLight position={[0, 2, 0]} />
-      {/* <mesh rotation={[Math.PI * -0.5, 0, 0]} position={[2, 0, 0]}>
-        <planeGeometry args={[20, 20, 20, 20]} />
-        <MeshReflectorMaterial
-          mirror={1}
-          // blur={[400, 100]}
-          resolution={1024}
-          // mixBlur={1}
-          mixStrength={15}
-          depthScale={1}
-          minDepthThreshold={0.15}
-          color="#151515"
-          metalness={0.6}
-          roughness={1}
-          side={DoubleSide}
-        />
-      </mesh> */}
+      {/* 
+      <ambientLight intensity={5} color={"black"} />
+      <directionalLight intensity={5} position={[0, 0, 2]} color={"black"} />
+      <directionalLight intensity={5} position={[0, 0, -2]} color={"black"} /> */}
+      <mesh rotation={[0, 0, 0]} position={[0, 0, 0]}>
+        <icosahedronGeometry args={[2, 32]} />
+        <meshBasicMaterial color={"#056CF2"} />
+      </mesh>
       <OrbitControls />
     </Canvas>
   );

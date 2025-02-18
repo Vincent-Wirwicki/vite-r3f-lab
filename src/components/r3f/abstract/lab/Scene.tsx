@@ -11,6 +11,7 @@ import { ShaderMaterial } from "three";
 const Scene = () => {
   return (
     <Canvas shadows>
+      <color attach={"background"} args={["black"]} />
       <NoisyMesh />
       <OrbitControls />
     </Canvas>
@@ -32,15 +33,18 @@ const NoisyMesh = () => {
     matRef.current.uniforms.uTime.value = clock.getElapsedTime();
   });
   return (
-    <mesh scale={[...screen]}>
-      <planeGeometry args={[1, 1]} />
-      <shaderMaterial
-        ref={matRef}
-        uniforms={shader.uniforms}
-        fragmentShader={shader.fragment}
-        vertexShader={shader.vertex}
-      />
-    </mesh>
+    <>
+      {/* scale={[...screen]} */}
+      <mesh>
+        <icosahedronGeometry args={[1, 64]} />
+        <shaderMaterial
+          ref={matRef}
+          uniforms={shader.uniforms}
+          fragmentShader={shader.fragment}
+          vertexShader={shader.vertex}
+        />
+      </mesh>
+    </>
   );
 };
 
