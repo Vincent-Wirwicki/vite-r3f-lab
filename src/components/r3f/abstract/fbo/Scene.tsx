@@ -23,10 +23,10 @@ const finalScene = () => {
       <ambientLight intensity={5} color={"black"} />
       <directionalLight intensity={5} position={[0, 0, 2]} color={"black"} />
       <directionalLight intensity={5} position={[0, 0, -2]} color={"black"} /> */}
-      <mesh rotation={[0, 0, 0]} position={[0, 0, 0]}>
+      {/* <mesh rotation={[0, 0, 0]} position={[0, 0, 0]}>
         <icosahedronGeometry args={[2, 32]} />
         <meshBasicMaterial color={"#056CF2"} />
-      </mesh>
+      </mesh> */}
       <OrbitControls />
     </Canvas>
   );

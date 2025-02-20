@@ -1,6 +1,6 @@
 import { useFBO } from "@react-three/drei";
-import { createPortal, useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal, useFrame } from "@react-three/fiber";
+import { useMemo, useRef, useState } from "react";
 import {
   AdditiveBlending,
   ShaderMaterial,
@@ -56,62 +56,22 @@ const PortScene = () => {
     return data;
   };
 
-  const getParams = (density: number, r1: number, r2: number) => {
-    const size = density * density * 4;
-    const data = new Float32Array(size);
-    const getRando = (min: number, max: number) => {
-      return Math.random() * (max - min) + min;
-    };
-    for (let i = 0; i < size; i++) {
-      const stride = i * 4; // Ensures uniform distribution
-      // x / y speed
-      const x = Math.random() * r1 - r2;
-      const y = Math.random() * r1 - r2;
-      const z = getRando(2, 1);
-      const w = getRando(1, 0.5);
-
-      data[stride] = x;
-      data[stride + 1] = y;
-      data[stride + 2] = z;
-      data[stride + 3] = w;
-    }
-    return data;
-  };
-
   // DATA POINT TEXTURE --------------
   const dataTex = useMemo(
     () =>
-      new DataTexture(getPlane(size, 4, 1), size, size, RGBAFormat, FloatType),
+      new DataTexture(getPlane(size, 2, 1), size, size, RGBAFormat, FloatType),
     []
   );
   dataTex.needsUpdate = true;
 
-  const offsetTex = useMemo(
-    () =>
-      new DataTexture(
-        getParams(size, 1, 0.5),
-        size,
-        size,
-        RGBAFormat,
-        FloatType
-      ),
-    []
-  );
-
-  offsetTex.needsUpdate = true;
-
   // SIM MAT ---------------
   const shaderSim = useMemo(
     () => ({
-      uniforms: {
-        uTime: { value: 0 },
-        uPositions: { value: dataTex },
-        uOffset: { value: offsetTex },
-      },
+      uniforms: { uTime: { value: 0 }, uPositions: { value: dataTex } },
       vertex: vertSim,
       fragment: fragSim,
     }),
-    [dataTex, offsetTex]
+    [dataTex]
   );
 
   // RENDER MAT ---------------
@@ -125,7 +85,7 @@ const PortScene = () => {
   );
 
   // FBO
-  let targetA = useFBO(512, 512, {
+  const targetA = useFBO(512, 512, {
     minFilter: NearestFilter,
     magFilter: NearestFilter,
     format: RGBAFormat,
@@ -134,34 +94,13 @@ const PortScene = () => {
     stencilBuffer: true,
   });
 
-  let targetB = targetA.clone();
-
-  const state = useThree();
-
-  //init FBO the texture
-  useEffect(() => {
-    const { gl } = state;
-    gl.setRenderTarget(targetA);
-    gl.clear();
-    gl.render(scene, cam);
-    gl.setRenderTarget(targetB);
-    gl.clear();
-    gl.render(scene, cam);
-    gl.setRenderTarget(null);
-  });
-
-  useFrame(({ gl, clock, camera }) => {
+  useFrame(({ gl, clock }) => {
     gl.setRenderTarget(targetA);
     gl.clear();
     gl.render(scene, cam);
     gl.setRenderTarget(null);
     simRef.current.uniforms.uTime.value = clock.elapsedTime;
-    simRef.current.uniforms.uPositions.value = targetA.texture;
-    renderRef.current.uniforms.uPositions.value = targetB.texture;
-    console.log(camera.position);
-    const temp = targetA;
-    targetA = targetB;
-    targetB = temp;
+    renderRef.current.uniforms.uPositions.value = targetA.texture;
   });
 
   return (
@@ -175,6 +114,20 @@ const PortScene = () => {
             vertexShader={shaderSim.vertex}
           />
           <planeGeometry args={[2, 2]} />
+          {/* <bufferGeometry>
+            <bufferAttribute
+              attach="attributes-position"
+              count={positions.length / 3}
+              array={positions}
+              itemSize={3}
+            />
+            <bufferAttribute
+              attach="attributes-uv"
+              count={uvs.length / 2}
+              array={uvs}
+              itemSize={2}
+            />
+          </bufferGeometry> */}
         </mesh>,
         scene
       )}
@@ -187,8 +140,8 @@ const PortScene = () => {
           vertexShader={shaderRender.vertex}
           blending={AdditiveBlending}
           transparent={true}
-          depthTest={false}
-          depthWrite={false}
+          depthTest={true}
+          depthWrite={true}
         />
 
         <bufferGeometry>

@@ -149,10 +149,12 @@ float map(in float v, in float iMin, in float iMax, in float oMin, in float oMax
       float move = map(sin(time * 2. * PI),-1.,1.,.5,0.95);
       float freq = map(offset.y - time,-1.,1.,2.,.5);
       // vec2 n = curl(vec2(0.5 * cos(pos.x),0.5 * sin(pos.y)) + (dist + uTime *0.1));
-      float n = snoiseFractal(vec3(vec2(angle * 2. * PI, dist ), uTime    )  )  ;
+      float n = snoiseFractal(vec3(vec2(sin(angle*  2. * PI + time2) , dist ), uTime *0.5    )  )  ;
+      // float n = snoiseFractal(vec3(vec2(angle * 2., dist * dist ), time *0.5 + offset.x    )  )  ;
+
       float bounds = smoothstep(0.,0.15,dist );
-      pos.x = dist * cos(angle + n ) ;
-      pos.y = dist * sin(angle + n ) ;
+      pos.x = dist * cos(angle + n ) * bounds;
+      pos.y = dist * sin(angle + n ) * bounds;
       // pos.z = n *0.15;
       // pos.xy -= normalize(pos.xy)  * n * smoothstep(0.95,0.15, dist-n ); ;
       // pos.z -= .15 * n * smoothstep(0.15,0.75,dist);

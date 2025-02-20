@@ -6,7 +6,6 @@ export const fragSim = /* glsl */ `
     varying vec2 vUv;  
     #define PI 3.141592653
  
-   
     // ---------------------------------------------------------------------------------
     //
     // Description : Array and textureless GLSL 2D/3D/4D simplex
@@ -18,6 +17,23 @@ export const fragSim = /* glsl */ `
     //               Distributed under the MIT License. See LICENSE file.
     //               https://github.com/ashima/webgl-noise
     //
+
+    // ---------------------------------------------------------------------------------
+    //
+    // Description : Array and textureless GLSL 2D/3D/4D simplex
+    //               noise functions.
+    //      Author : Ian McEwan, Ashima Arts.
+    //  Maintainer : ijm
+    //     Lastmod : 20110822 (ijm)
+    //     License : Copyright (C) 2011 Ashima Arts. All rights reserved.
+    //               Distributed under the MIT License. See LICENSE file.
+    //               https://github.com/ashima/webgl-noise
+    //
+//	Simplex 3D Noise 
+//	by Ian McEwan, Stefan Gustavson (https://github.com/stegu/webgl-noise)
+//
+// 	<www.shadertoy.com/view/XsX3zB>
+//	by Nikita Miropolskiy
 
 // 	<www.shadertoy.com/view/XsX3zB>
 //	by Nikita Miropolskiy
@@ -78,139 +94,6 @@ float snoiseFractal(vec3 m) {
 }
 
 
-//	Classic Perlin 3D Noise 
-//	by Stefan Gustavson (https://github.com/stegu/webgl-noise)
-//
-vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
-vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
-vec3 fade(vec3 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}
-
-float cnoise(vec3 P){
-  vec3 Pi0 = floor(P); // Integer part for indexing
-  vec3 Pi1 = Pi0 + vec3(1.0); // Integer part + 1
-  Pi0 = mod(Pi0, 289.0);
-  Pi1 = mod(Pi1, 289.0);
-  vec3 Pf0 = fract(P); // Fractional part for interpolation
-  vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
-  vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
-  vec4 iy = vec4(Pi0.yy, Pi1.yy);
-  vec4 iz0 = Pi0.zzzz;
-  vec4 iz1 = Pi1.zzzz;
-
-  vec4 ixy = permute(permute(ix) + iy);
-  vec4 ixy0 = permute(ixy + iz0);
-  vec4 ixy1 = permute(ixy + iz1);
-
-  vec4 gx0 = ixy0 / 7.0;
-  vec4 gy0 = fract(floor(gx0) / 7.0) - 0.5;
-  gx0 = fract(gx0);
-  vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
-  vec4 sz0 = step(gz0, vec4(0.0));
-  gx0 -= sz0 * (step(0.0, gx0) - 0.5);
-  gy0 -= sz0 * (step(0.0, gy0) - 0.5);
-
-  vec4 gx1 = ixy1 / 7.0;
-  vec4 gy1 = fract(floor(gx1) / 7.0) - 0.5;
-  gx1 = fract(gx1);
-  vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
-  vec4 sz1 = step(gz1, vec4(0.0));
-  gx1 -= sz1 * (step(0.0, gx1) - 0.5);
-  gy1 -= sz1 * (step(0.0, gy1) - 0.5);
-
-  vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
-  vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
-  vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
-  vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
-  vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
-  vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
-  vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
-  vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
-
-  vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
-  g000 *= norm0.x;
-  g010 *= norm0.y;
-  g100 *= norm0.z;
-  g110 *= norm0.w;
-  vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
-  g001 *= norm1.x;
-  g011 *= norm1.y;
-  g101 *= norm1.z;
-  g111 *= norm1.w;
-
-  float n000 = dot(g000, Pf0);
-  float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
-  float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
-  float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
-  float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
-  float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
-  float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
-  float n111 = dot(g111, Pf1);
-
-  vec3 fade_xyz = fade(Pf0);
-  vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
-  vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
-  float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
-  return 2.2 * n_xyz;
-}
-
-
-float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
-vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
-vec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}
-
-float noise(vec3 p){
-    vec3 a = floor(p);
-    vec3 d = p - a;
-    d = d * d * (3.0 - 2.0 * d);
-
-    vec4 b = a.xxyy + vec4(0.0, 1.0, 0.0, 1.0);
-    vec4 k1 = perm(b.xyxy);
-    vec4 k2 = perm(k1.xyxy + b.zzww);
-
-    vec4 c = k2 + a.zzzz;
-    vec4 k3 = perm(c);
-    vec4 k4 = perm(c + 1.0);
-
-    vec4 o1 = fract(k3 * (1.0 / 41.0));
-    vec4 o2 = fract(k4 * (1.0 / 41.0));
-
-    vec4 o3 = o2 * d.z + o1 * (1.0 - d.z);
-    vec2 o4 = o3.yw * d.x + o3.xz * (1.0 - d.x);
-
-    return o4.y * d.y + o4.x * (1.0 - d.y);
-}
-
-float fbm(vec3 x) {
-	float v = 0.0;
-	float a = 0.5;
-	vec3 shift = vec3(100);
-	for (int i = 0; i < 4; ++i) {
-		v += a * noise(x);
-		x = x * 2.0 + shift;
-		a *= 0.5;
-	}
-	return v;
-}
-
-
-        float map0(float v, float iMin, float iMax ) { return (v-iMin)/(iMax-iMin); }
-  
-    vec3 attractor(vec3 pos, float dt){
-        float a = 1.89;
-
-        vec3 target = vec3(0);
-        float x = pos.x;
-        float y = pos.y;
-        float z = pos.z;
-
-        target.x = -a*x - 4.*y - 4.*z - y*y;
-        target.y = -a*y - 4.*z - 4.*x -z*z ;
-        target.z = -a*z -4.*x - 4.*y - x*x ;
-        
-        return target * dt;
-      
-    }
-
 // sin(dt * 2. * PI) * cos(dt * 2. * PI)
 
 float sdCircle( vec2 p, float r )
@@ -244,7 +127,14 @@ vec2 rotate(in vec2 v, in float r, in vec2 c) {
     return rotate2d(r) * (v - c) + c;
 }
 
+float map(in float v, in float iMin, in float iMax, in float oMin, in float oMax) { return oMin + (oMax - oMin) * (v - iMin) / (iMax - iMin); }
 
+float smoothMod(float axis, float amp, float rad) {
+    float top = cos(PI * (axis / amp)) * sin(PI * (axis / amp));
+    float bottom = pow(sin(PI * (axis / amp)), 2.0) + pow(rad, 2.0);
+    float at = atan(top / bottom);
+    return amp * (1.0 / 2.0) - (1.0 / PI) * at;
+}
 
     void main(){
       vec2 uv = vUv;
@@ -253,56 +143,69 @@ vec2 rotate(in vec2 v, in float r, in vec2 c) {
 
       float repeat = sin(time * 2. * PI);
       vec4 pos = texture2D( uPositions, uv );
-      vec4 offset = texture2D(uOffset, uv);
-      vec3 ip = pos.xyz;
+        vec4 offset = texture2D( uOffset, uv );
+      vec4 ip = pos;
 
-      float life = offset.w;
+      float angle = atan(pos.x, pos.y);
+      float radius = length(pos.xy);
+      vec2 dir = normalize(pos.xy);
+      vec2 vel = offset.xy;
+      // float zz = exp(-pos.z * (radius  )  );
 
-      life -= 0.1;
-      if(life < 0.) {
-        pos.xyz = ip;
-        life = offset.w;
+// float z = log(  abs(sin((radius -0.5) * 2. * c - time *2. * PI ) * 2. )) *0.075 ;
+
+      float waveRadius = pow(1. - radius,  .75) *4.15;
+      float wave = sin((radius + uTime*0.15) * 25.  + angle ) * waveRadius ;
+      float bounds = smoothstep(0.,1., log(radius));
+      // pos.z = wave * waveRadius ;
+
+
+
+       float fractZom = exp(repeat * 0.3);
+       float fr1 = pow(radius / fractZom , .1 - fractZom);
+       float fr2 = pow(radius * fractZom , 2. - fractZom);
+
+
+      float z1 = log(abs(sin((1. - radius) * 8. + uTime *2. * PI *0.25 ) )) *.15;
+      float reset = map( radius,  0.,1., PI, PI *0.5);
+      float n = snoiseFractal(vec3( angle *8. , radius * reset  , 1. ) ) *0.15;
+      // float z2 = exp(-pos.z / pow(radius/zoomF , 1.15  ) * z1 + n    ) *.5;
+      float z2 = exp(-pos.z / radius * z1 + n    ) *.5;
+
       
-      };
-      // sphere
-      float radius = length(pos.xyz);
-      float theta = atan(pos.x, pos.y);
-      float phi = acos(pos.z / radius);  
-      // clelia
+      pos.z = z2 * fr2 ;
 
 
-      float noiseTheta = snoiseFractal(vec3(theta + uTime*0.1   , phi *2.  , radius));
-      float noisePhi = snoiseFractal(vec3(phi * 2. + uTime*0.1, theta   , radius));
-      float noiseZ = snoiseFractal(vec3(theta , phi , uTime * 0.1));
-      float bounds = smoothstep(0.15,0.75,theta * 4.);
-      float str = 2. ;
-      // theta += noiseTheta;
-      // phi += noisePhi;
-
-      float x = radius * sin(phi  + noisePhi * str) * cos(theta  + noiseTheta*str)   ;
-      float y = radius * sin(phi  + noisePhi * str) * sin(theta  + noiseTheta*str)    ;
-      float z = radius * cos(phi  + noisePhi * str)  ;
-      vec3 disp = vec3(x,y,z) ;
-
-      // vec3 vel = offset.xyz;
-      // vel = disp *0.1;
-
-      pos.xyz = disp  ;
-      // pos.z += noiseZ * 0.5;
-      // pos.x = radius * sin(phi + noisePhi * str) * cos(theta + noiseTheta*str)  ;
-      // pos.y = radius * sin(phi + noisePhi * str) * sin(theta + noiseTheta*str)  ;
-      // pos.z = radius * cos(phi + noisePhi * str) ;
+      pos.x = (radius   ) * cos(angle + uTime *0.25) ;
+      pos.y = (radius   ) * sin(angle + uTime *0.25) ;
 
 
+      // float z1 = log(abs(sin((1. - radius ) * 8.  - time *2. * PI   ) )) *.085;
+      // float z1 = log((radius - 0.5)   ) *.25;
+      // float n = snoise(vec2(z1, z1)) *0.1;
+      // float z2 = exp(-pos.z /  radius    )*0.075 ;
+      // pos.z = z1  ;
 
+      // pos.y -= length(z1 * radius ) * cos(angle * n ) *0.01  ;
+      // pos.x -= length(z1 * radius ) * sin(angle * n ) *0.01 ;
+
+      // float speed = offset.x * normalize(z1)*0.1 ;
+      // pos.x = radius * cos(angle  + uTime * 0.5  )   ;
+      // pos.y = radius * sin(angle  + uTime * 0.5 )  ;
       gl_FragColor = vec4( pos);
 
 
     }
 
 `;
-// -y * x(x*x* + y*y)
-//  x-y*(x*x + y*y)
+
+// 2 render
+// float freq = map(offset.y - time,-1.,1.,2.,.5);
+// // vec2 n = curl(vec2(0.5 * cos(pos.x),0.5 * sin(pos.y)) + (dist + uTime *0.1));
+// float n = snoiseFractal(vec3(pos.xy * freq, offset.x - time2 )  ) * smoothstep(0.95,0.75,dist) ;
+// pos.xy -= normalize(pos.xy)  * n * smoothstep(0.95,0.15, dist-n ); ;
+// pos.z -= .15 * n * smoothstep(0.15,0.75,dist);
+// 1 render
 // vec2 flow = vec2(cos(noise *2. * PI ), sin(noise*2. * PI));
 // float x = map(flow.x, -1.,1.,-2.,1.);
 // float y = map(flow.y, -1.,1.,-2.,1.);

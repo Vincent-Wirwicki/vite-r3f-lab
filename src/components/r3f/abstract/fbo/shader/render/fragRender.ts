@@ -20,7 +20,7 @@ float alpha = smoothstep(0.5, 0.65, dist);
 // vec3(.35,.155,2.155) electric violet
 
 // Final color output
-gl_FragColor = vec4(vec3(.35), 1.);
+gl_FragColor = vec4(vec3(.25,.155,2.155), 1.);
     }
 
 `;
