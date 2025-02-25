@@ -28,13 +28,13 @@ vec3 tonemapACES(vec3 v) {
         vUv = uv;
         vec4 mvPosition = modelViewMatrix * vec4(position, 1.);
         vec3 diff = normalize(pos.xyz );
-        vec3 light = normalize(vec3(0.,0.,3.));
+        vec3 light = normalize(vec3(0.,0.,1.));
         float diffuse = max(dot(diff, light),0.);
         float lum = dot(pos, vec3(0.21250175, 0.71537574, 0.07212251));
         vDiff = diffuse;
         vTone = tonemapFilmic(pos * diffuse );
         // vDistance = -mvPosition.z;
-        gl_PointSize = 2. * (1./ -mvPosition.z);
+        gl_PointSize = 1. * (1./ -mvPosition.z);
         // gl_PointSize =  (1./ length(pos));
         gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1. );
     }

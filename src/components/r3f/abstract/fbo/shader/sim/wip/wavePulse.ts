@@ -243,6 +243,23 @@ float smoothMod(float axis, float amp, float rad) {
       // }
       // --- SINGLE WAVE end ---------------------------------------------------------------------
 
+    //   SINGLE WAVE Varient ----------------------------------------------------
+        //     for(int i = 0; i<4; i++){
+        // float timer = (mod(uTime*0.2 + float(i),.25))  * 0.25 ;
+        // float r = pow(0.8, timer * float(i)  );
+
+        // float t1 = pow((radius*float(i)), .2 / r ) ;
+        // float n = snoiseFractal(vec3( angle *12., radius * (.8/ r) , 1.) ) *.5 ;
+
+        // float z1 = log(abs(sin(((radius  + n)) * 4. - uTime *2. * PI *0.3))) *.45;
+        // float z2 = exp(-pos.z / radius * z1 ) *.25;
+        // pos.z = z2 * t1;
+
+        // pos.x = radius * cos(angle + uTime *0.3) ;
+        // pos.y = radius * sin(angle + uTime *0.3) ;
+    //   }
+    //   SINGLE WAVE Varient ----------------------------------------------------
+
       gl_FragColor = vec4( pos);
 
 

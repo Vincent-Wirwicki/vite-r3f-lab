@@ -43,8 +43,8 @@ const PortScene = () => {
       const stride = i * 4;
       const theta = 2 * Math.PI * Math.random();
       const r = Math.sqrt(Math.random() * r1 - r2); // Ensures uniform distribution
-      const x = r * Math.cos(theta);
-      const y = r * Math.sin(theta);
+      const x = Math.random() * r1 - r2;
+      const y = Math.random() * r1 - r2;
       const z = 1;
       const w = 1;
 

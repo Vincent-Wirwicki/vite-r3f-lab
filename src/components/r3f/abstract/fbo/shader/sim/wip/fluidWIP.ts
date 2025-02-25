@@ -98,19 +98,19 @@ float fbm(in vec2 st) {
     void main(){
           vec2 uv = vUv;
         vec4 pos = texture2D( uPositions, uv );
-        // vec4 offset = texture2D( uPositions, uv );
-
+        vec4 offset = texture2D( uPositions, uv );
+     
         vec4 newPos = pos;
         float time = mod(mod(uTime *0.15, 1.0) + 1.0, 1.0);
         float repeat = sin(time *2. * PI);
-        
+        vec2 vel = offset.xy;
         vec2 pixel = vec2(1./512., 1./512.);
 
         //  params
-        float fluid_dt = 0.15 * uTime ;
-        const float fluid_visco = 0.16;
+        float fluid_dt = 0.1;
+        const float fluid_visco = 0.8;
         const float fluid_decay = 5e-6;
-        const float fluid_vorty = 0.3;
+        const float fluid_vorty = 0.1;
 
         vec2 force = vec2(0.15,0.15);
 
@@ -147,7 +147,7 @@ float fbm(in vec2 st) {
         d.xy += fluid_dt * (viscosityForce - densityInvariance );
 
         // velocity decay
-        d.xy = max(vec2(0.), abs(d.xy) - fluid_decay) * sign(d.xy);
+        // d.xy = max(vec2(0.), abs(d.xy) - fluid_decay) * sign(d.xy);
 
         // vorticity
         d.w = (dB.x - dT.x + dR.y - dL.y); // curl stored in the w channel
@@ -156,17 +156,17 @@ float fbm(in vec2 st) {
         d.xy += vorticity *0.5;
 
         // Boundary conditions
-        d.xy *= smoothstep(0.5, 0.49,abs(uv - 0.5));
+        d.xy *= smoothstep(0.5, 0.49,abs(uv - 0.8 ));
 
         // Pack XY, Z and W data
         d.xy = clamp(d.xy, -0.999, 0.999);
         d.zw = clamp(d.zw,0.,1.);
-       
-        pos = d  ;
-        // pos = mod(pos, 1.);
+        // vel *= d.xy;
+        // pos = d  ;
+        // d = mod(d, 1.);
 
 
-        gl_FragColor = vec4(pos);
+        gl_FragColor = vec4(d);
 
     }
 

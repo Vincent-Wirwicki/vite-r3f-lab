@@ -24,7 +24,11 @@ float lum = dot(vPos, vec3(0.21250175, 0.71537574, 0.07212251));
 float blend = min(1. - vTone.z, vDiff);
 
 // gl_FragColor = vec4((1. - vTone.z - vTone.x) * vec3(.35,.155,2.155), 1.);
-gl_FragColor = vec4((blend ) * vec3(.35,.55,2.155), 1.);
+// gl_FragColor = vec4( vec3(.135,.155,2.155), 1.);
+// gl_FragColor = vec4(blend * vec3(.15,.155,2.155), 1.);
+
+gl_FragColor = vec4(vec3(0.15), 1.);
+
 
     }
 
