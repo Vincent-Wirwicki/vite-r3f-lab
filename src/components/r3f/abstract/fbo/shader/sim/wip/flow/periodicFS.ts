@@ -265,37 +265,32 @@ float map(in float v, in float iMin, in float iMax, in float oMin, in float oMax
         float timer = mod(uTime * 0.1, 1.0);
         float sc = map(sin(timer*2.*PI), -2.,2.,1.,8.);
       // works well full screen
-      float n = psrddnoise(pos.xy * floor(sc) + vec2(1., uTime *0.5) , vec2(2.0), uTime*0.75, grad, der);  
-      float curvature = der.x - der.y;
-      vec3 d3 = vec3(der);
-      float curve = ( curvature*0.01);  
-      vec2 nv = normalize(grad);
-      float na = atan(grad.x, grad.y);
-      vec3 test = normalize(cross(normalize(d3), normalize(pos.xyz)));
-      // vel *= na * curv + nv*0.25;
-      // pos.xy += vel * n * 0.25;
-      vel *= nv + curve;
-      pos.xy += vel * n * .75 ;
-      // Wrap position within [0,1] space
-      pos = mod(pos , 1.);
-      // float alpha = radius + uTime*0.5  ;
-      // vec2 period = vec2(1., 1.);
-
-      // float n = psrddnoise(pos.xy * 4.   ,period, alpha, grad, der);
-      // //  n += psrddnoise(pos.xy *0.5  ,period * .5, alpha * .5, grad, der)*2.;
-      // // n += psrddnoise(pos.xy *4. + grad * 2.,period, alpha * .25, grad, der)*0.25;   
-      // float curvature = (der.x - der.y)  ;
-      // float curv = ( curvature) *1./radius;
-      // vec2 ncurl = vec2(grad.x, -grad.y) ;  
+      // float n = psrddnoise(pos.xy * floor(sc) + vec2(1., uTime *0.5) , vec2(2.0), uTime*0.75, grad, der);  
+      // float curvature = der.x - der.y;
+      // vec3 d3 = vec3(der);
+      // float curve = ( curvature*0.01);  
       // vec2 nv = normalize(grad);
       // float na = atan(grad.x, grad.y);
-      // // vel *=  curv  ;
-      // // vel*=ncurl * 0.1;
-      // vel *= nv*0.1; 
-      // // pos.xy += n  * vel * pow(curv, 4.) ;
-      // pos.xy += n  * vel  ;
-      // // pos.z = exp(-pos.z/radius );
+      // vec3 test = normalize(cross(normalize(d3), normalize(pos.xyz)));
+      // // vel *= na * curv + nv*0.25;
+      // // pos.xy += vel * n * 0.25;
+      // vel *= nv + curve;
+      // pos.xy += vel * n * .75 ;
+      // // Wrap position within [0,1] space
+      // pos = mod(pos , 1.);
+      float alpha =  uTime *0.75  ;
+      vec2 period = vec2(1., 1.);
 
+      float timer2 = mod(uTime * 0.15, 1.0);
+      float sc2 = map(sin(timer2*2.*PI), 0.,1.,.5,1.);
+      float p2 = map(sin(timer2*2.*PI), -2.,2.,1.,4.);
+      float n = psrddnoise(pos.xy * vec2(2.,p2)+ vec2(1., uTime * 0.5)  ,vec2(2.,4.), alpha, grad, der);
+      float curve = ( der.x + der.y)*0.1 ;
+      vec2 zcurl = vec2(grad.x, -grad.y);
+       vel *= curve ; 
+      pos.xy += n * vel * 0.15  ;
+      // pos.z = exp(-pos.z/radius );
+      pos = mod(pos , 1.);
 
       // vel *= nv *0.01; 
       // pos.xy += normalize(n)* vel * curv ;

@@ -321,41 +321,31 @@ float fbmLow(vec2 uv){
       // --------------
     
     // 2---------------
-    // vec2 eps = vec2(0.0001,0);
+    vec2 eps = vec2(0.0001,0);
     
-    // float dx = (field(pos.xy - eps.xy) - field(pos.xy + eps.xy))/(2.0 * eps.x);
-    // float dy = (field(pos.xy - eps.yx) - field(pos.xy + eps.yx))/(2.0 * eps.x);
+    float dx = (field(pos.xy - eps.xy) - field(pos.xy + eps.xy))/(2.0 * eps.x);
+    float dy = (field(pos.xy - eps.yx) - field(pos.xy + eps.yx))/(2.0 * eps.x);
     
-    // vec2 v = vec2(dy,-dx) * 5.;
+    vec2 v = vec2(dy,-dx) * 5.;
 
-    //   vel *= v * dir *0.1;
-    //   pos.x += vel.x * 0.4   ;
-    //   pos.y += vel.y * 0.4 ;
+      vel *= v * dir *0.1;
+      pos.x += vel.x * 0.4   ;
+      pos.y += vel.y * 0.4 ;
       //---------------------------
 
       // vec3 c =curl(pos.x * .5, pos.y * .5, pos.z * .5) * .75;
-      float fb = fbm(pos.xy + fbmLow(pos.xy) );
-      float fb2 = fbm(vec2(fb + vec2(5.2,7.8) + vec2(uTime*0.1)) + fbmLow(vec2(fb + vec2(10.5,4.2) + vec2(uTime*0.1))));
-      // fb = fb *fb*fb;
-      fb2 = fb2 * fb2 * fb2;
+    //   float fb = fbm(pos.xy + fbmLow(pos.xy) );
+    //   float fb2 = fbm(vec2(pos.xy + vec2(5.2,7.8) + vec2(uTime*0.01)) + fbmLow(vec2(pos.xy + vec2(10.5,4.2) + vec2(uTime*0.01))));
+    //   // fb = fb *fb*fb;
+    //   // fb2 = fb2 * fb2 * fb2;
+    //   vec3 color = vec3(0.75,0.15,0.89);
+      
       vel *= vec2(fb2);
-      pos.x += vel.x *0.1;
-       pos.y += vel.y *0.1;
-      // pos.x += vel.x - (length(c.xy) * c.z);
-      // pos.y += vel.y - (length(c.xy) * c.z); 
-      // pos.z += velZ* length(pos.xy);
-    
-      // pos.z =  nc.x* nc.y  ;
-      // if(  pos.y <= 0. ||pos.y >= 2. ) pos.y = ip.y;
-      // if(  pos.x <= 0. || pos.x >= 2.) pos.x = ip.x;
-      // if(  pos.z <= 0. || pos.y >= 2.) pos.z += ip.z * 1.2;
+      pos.xy += mix(pos.xy, vec2(0.01) , fb * fb * 0.1 );
+      pos.xy += mix(pos.xy, pos.xy + vec2(.005), smoothstep(0.05,0., fb2) * smoothstep(0.,0.05, fb2));
+      pos.x += vel.x *0.01;
+      pos.y += vel.y *0.01;
 
-      // if(  pos.y <= 0.) pos.y += ip.y * 1.2;
-      // if(  pos.x <= 0.) pos.x += ip.x * 1.2;
-      // if(  pos.z <= 0.) pos.z += ip.z * 1.2;
-      // if(pos.y >= 2.) pos.y -= ip.y;
-      // if(pos.x >= 2.) pos.x -= ip.x;
-      // if(pos.z >= 2.) pos.z -= ip.z;
       pos.xyz = mod(pos.xyz, 2.);
       gl_FragColor = vec4(pos);
 
